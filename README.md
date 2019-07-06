@@ -2,6 +2,8 @@
 Hypersign authenticator for Keycloak
 
 1. First, Keycloak must be running.
+   
+   To install using Docker Container https://hub.docker.com/r/jboss/keycloak/
 
 2. Execute the follow.  This will build the example and deploy it
 
