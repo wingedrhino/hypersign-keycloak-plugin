@@ -5,11 +5,13 @@ Hypersign authenticator for Keycloak
    
    To install using Docker Container https://hub.docker.com/r/jboss/keycloak/
 
-2. Execute the follow.  This will build the example and deploy it
+2. To build the hs-authenticator jar file.
 
-   $ mvn clean install wildfly:deploy
+   . Run mvn clean install
+   . Go to the target folder, you should see new jar created.
+   . Take the jar file and put it under the keycloak/standalone/deployments folder.
 
-3. Copy the secret-question.ftl and secret-question-config.ftl files to the themes/base/login directory.
+3. Copy the hyerpsign-config.ftl and hyerpsign.ftl files to the themes/base/login directory.
 
 4. Login to admin console.  Hit browser refresh if you are already logged in so that the new providers show up.
 
