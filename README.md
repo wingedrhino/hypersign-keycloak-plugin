@@ -25,3 +25,8 @@ Hypersign authenticator for Keycloak
    Your new required action should now be displayed and enabled in the required actions list.
 
 
+**How to setup the project in Eclipse ?**
+
+1. Clone the hs-authenticator repo in your computer.
+2. Open Eclipse IDE and select "Import exisiting maven project".
+3. Browse the folde where hs-authenticator is downloaded and import it to your eclipse worksapce.
