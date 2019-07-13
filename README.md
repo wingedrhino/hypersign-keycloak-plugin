@@ -1,6 +1,14 @@
 # hs-authenticator
 Hypersign authenticator for Keycloak
 
+**How to setup the project in Eclipse ?**
+
+1. Clone the hs-authenticator repo in your computer.
+2. Open Eclipse IDE and select "Import exisiting maven project".
+3. Browse the folder where hs-authenticator is already downloaded and import it to your eclipse worksapce.
+
+**How to integrate the new authneticor in Keycloak server?**
+
 1. First, Keycloak must be running.
    
    To install using Docker Container https://hub.docker.com/r/jboss/keycloak/
@@ -25,8 +33,4 @@ Hypersign authenticator for Keycloak
    Your new required action should now be displayed and enabled in the required actions list.
 
 
-**How to setup the project in Eclipse ?**
 
-1. Clone the hs-authenticator repo in your computer.
-2. Open Eclipse IDE and select "Import exisiting maven project".
-3. Browse the folde where hs-authenticator is downloaded and import it to your eclipse worksapce.
