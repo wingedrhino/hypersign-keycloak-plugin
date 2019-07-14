@@ -8,7 +8,6 @@ ENV JAVA_OPTS -server -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSiz
 ENV KEYCLOAK_USER admin
 ENV KEYCLOAK_PASSWORD admin
 
-COPY target/HyperSignAuth-sources.jar /opt/jboss/keycloak/standalone/deployments
 COPY target/HyperSignAuth.jar /opt/jboss/keycloak/standalone/deployments
 COPY hyerpsign-config.ftl /opt/jboss/keycloak/themes/base/login
 COPY hyerpsign.ftl /opt/jboss/keycloak/themes/base/login
