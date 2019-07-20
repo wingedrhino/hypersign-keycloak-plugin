@@ -32,11 +32,5 @@ Hypersign authenticator for Keycloak
    Click on the Register button and choose your new Required Action.
    Your new required action should now be displayed and enabled in the required actions list.
 
-# hs-authenticator-docker
-To run this as docker container
-
-1. `mvn clean install`
-2. `docker build -t hypermine/hypersign .`
-
 
 
