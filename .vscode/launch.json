@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - TestJson",
+            "request": "launch",
+            "mainClass": "org.hypermine.hypersing.authenticator.TestJson",
+            "projectName": "HyperSignAuth"
+        }
+    ]
+}

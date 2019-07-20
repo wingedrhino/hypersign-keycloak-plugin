@@ -1,0 +1,7 @@
+org/hypermine/hypersing/authenticator/SecretQuestionCredentialProvider.class
+org/hypermine/hypersing/authenticator/QRCodeGenerator.class
+org/hypermine/hypersing/authenticator/SecretQuestionRequiredAction.class
+org/hypermine/hypersing/authenticator/SecretQuestionCredentialProviderFactory.class
+org/hypermine/hypersing/authenticator/HyperSignAuthenticator.class
+org/hypermine/hypersing/authenticator/SecretQuestionRequiredActionFactory.class
+org/hypermine/hypersing/authenticator/HyperSignAuthenticatorFactory.class

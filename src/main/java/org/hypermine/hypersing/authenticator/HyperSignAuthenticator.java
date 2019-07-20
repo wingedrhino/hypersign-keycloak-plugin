@@ -60,7 +60,7 @@ public class HyperSignAuthenticator implements Authenticator {
             context.success();
             return;
         }
-        //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
+        // String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
         Response challenge = context.form().createForm("secret-question.ftl");
         context.challenge(challenge);
         
