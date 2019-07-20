@@ -1,0 +1,5 @@
+.env
+keycloak/*
+.vscode
+.sts4-cache
+target
