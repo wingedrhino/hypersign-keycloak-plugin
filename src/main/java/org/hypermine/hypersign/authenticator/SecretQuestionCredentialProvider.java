@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hypermine.hypersing.authenticator;
+package org.hypermine.hypersign.authenticator;
 
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialInput;

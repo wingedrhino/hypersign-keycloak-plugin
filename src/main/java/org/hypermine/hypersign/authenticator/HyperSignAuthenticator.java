@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.hypermine.hypersing.authenticator;
+package org.hypermine.hypersign.authenticator;
 
 import org.jboss.resteasy.spi.HttpResponse;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;

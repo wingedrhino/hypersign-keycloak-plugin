@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.hypermine.hypersing.authenticator;
+package org.hypermine.hypersign.authenticator;
 
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
