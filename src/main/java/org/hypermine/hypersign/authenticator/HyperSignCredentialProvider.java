@@ -38,13 +38,13 @@ import java.util.Set;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SecretQuestionCredentialProvider implements CredentialProvider, CredentialInputValidator, CredentialInputUpdater, OnUserCache {
-    public static final String SECRET_QUESTION = "SECRET_QUESTION";
-    public static final String CACHE_KEY = SecretQuestionCredentialProvider.class.getName() + "." + SECRET_QUESTION;
+public class HyperSignCredentialProvider implements CredentialProvider, CredentialInputValidator, CredentialInputUpdater, OnUserCache {
+    public static final String QR_CODE = "QR_CODE";
+    public static final String CACHE_KEY = HyperSignCredentialProvider.class.getName() + "." + QR_CODE;
 
     protected KeycloakSession session;
 
-    public SecretQuestionCredentialProvider(KeycloakSession session) {
+    public HyperSignCredentialProvider(KeycloakSession session) {
         this.session = session;
     }
 
@@ -55,7 +55,7 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
             secret = (CredentialModel)cached.getCachedWith().get(CACHE_KEY);
 
         } else {
-            List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
+            List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, QR_CODE);
             if (!creds.isEmpty()) secret = creds.get(0);
         }
         return secret;
@@ -64,13 +64,13 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
 
     @Override
     public boolean updateCredential(RealmModel realm, UserModel user, CredentialInput input) {
-        if (!SECRET_QUESTION.equals(input.getType())) return false;
+        if (!QR_CODE.equals(input.getType())) return false;
         if (!(input instanceof UserCredentialModel)) return false;
         UserCredentialModel credInput = (UserCredentialModel) input;
-        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
+        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, QR_CODE);
         if (creds.isEmpty()) {
             CredentialModel secret = new CredentialModel();
-            secret.setType(SECRET_QUESTION);
+            secret.setType(QR_CODE);
             secret.setValue(credInput.getValue());
             secret.setCreatedDate(Time.currentTimeMillis());
             session.userCredentialManager().createCredential(realm ,user, secret);
@@ -84,9 +84,9 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
 
     @Override
     public void disableCredentialType(RealmModel realm, UserModel user, String credentialType) {
-        if (!SECRET_QUESTION.equals(credentialType)) return;
+        if (!QR_CODE.equals(credentialType)) return;
 
-        List<CredentialModel> credentials = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
+        List<CredentialModel> credentials = session.userCredentialManager().getStoredCredentialsByType(realm, user, QR_CODE);
         for (CredentialModel cred : credentials) {
             session.userCredentialManager().removeStoredCredential(realm, user, cred.getId());
         }
@@ -95,9 +95,9 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
 
     @Override
     public Set<String> getDisableableCredentialTypes(RealmModel realm, UserModel user) {
-        if (!session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION).isEmpty()) {
+        if (!session.userCredentialManager().getStoredCredentialsByType(realm, user, QR_CODE).isEmpty()) {
             Set<String> set = new HashSet<>();
-            set.add(SECRET_QUESTION);
+            set.add(QR_CODE);
             return set;
         } else {
             return Collections.EMPTY_SET;
@@ -107,18 +107,18 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
 
     @Override
     public boolean supportsCredentialType(String credentialType) {
-        return SECRET_QUESTION.equals(credentialType);
+        return QR_CODE.equals(credentialType);
     }
 
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
-        if (!SECRET_QUESTION.equals(credentialType)) return false;
+        if (!QR_CODE.equals(credentialType)) return false;
         return getSecret(realm, user) != null;
     }
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput input) {
-        if (!SECRET_QUESTION.equals(input.getType())) return false;
+        if (!QR_CODE.equals(input.getType())) return false;
         if (!(input instanceof UserCredentialModel)) return false;
 
         String secret = getSecret(realm, user).getValue();
@@ -128,7 +128,7 @@ public class SecretQuestionCredentialProvider implements CredentialProvider, Cre
 
     @Override
     public void onCache(RealmModel realm, CachedUserModel user, UserModel delegate) {
-        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, SECRET_QUESTION);
+        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, QR_CODE);
         if (!creds.isEmpty()) user.getCachedWith().put(CACHE_KEY, creds.get(0));
     }
 }

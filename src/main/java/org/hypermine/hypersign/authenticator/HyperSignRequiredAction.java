@@ -27,8 +27,8 @@ import javax.ws.rs.core.Response;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SecretQuestionRequiredAction implements RequiredActionProvider {
-    public static final String PROVIDER_ID = "secret_question_config";
+public class HyperSignRequiredAction implements RequiredActionProvider {
+    public static final String PROVIDER_ID = "hypersign_config";
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
@@ -37,16 +37,16 @@ public class SecretQuestionRequiredAction implements RequiredActionProvider {
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
-        Response challenge = context.form().createForm("secret-question-config.ftl");
+        Response challenge = context.form().createForm("hypersign-config.ftl");
         context.challenge(challenge);
 
     }
 
     @Override
     public void processAction(RequiredActionContext context) {
-        String answer = (context.getHttpRequest().getDecodedFormParameters().getFirst("secret_answer"));
+        String answer = (context.getHttpRequest().getDecodedFormParameters().getFirst("QR_CODE"));
         UserCredentialModel input = new UserCredentialModel();
-        input.setType(SecretQuestionCredentialProvider.SECRET_QUESTION);
+        input.setType(HyperSignCredentialProvider.QR_CODE);
         input.setValue(answer);
         context.getSession().userCredentialManager().updateCredential(context.getRealm(), context.getUser(), input);
         context.success();

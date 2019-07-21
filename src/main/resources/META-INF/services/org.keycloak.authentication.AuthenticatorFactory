@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 
-org.hypermine.hypersing.authenticator.HyperSignAuthenticatorFactory
+org.hypermine.hypersign.authenticator.HyperSignAuthenticatorFactory
