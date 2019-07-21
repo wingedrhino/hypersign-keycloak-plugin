@@ -20,12 +20,28 @@ import org.json.JSONObject;
 public class QRCodeGenerator {
 	// private static HttpURLConnection connection;
 	private static String USER_AGENT = "Mozilla/5.0";
+	private static String BaseUri;
+	private static String CompanyId;
+	private static String Token;
+	
+	QRCodeGenerator(){
+
+		Dotenv dotenv = Dotenv.load();
+
+		this.BaseUri = dotenv.get("HS_BASE_URI");
+
+		this.CompanyId = dotenv.get("HS_COMPANY_ID");
+
+		this.Token = dotenv.get("HS_TOKEN");
+
+   	}
 
 	public  static String createORLoginPage(String relamName) {
 			
 		String challenge = getChallenge();
 
 		String qrCodeText = relamName+'-'+challenge;
+
 		ByteArrayOutputStream bout =QRCode.from(qrCodeText).withSize(800, 800).to(ImageType.PNG).stream();
 
 		String encoded = Base64.getEncoder().encodeToString(bout.toByteArray());        
@@ -37,14 +53,10 @@ public class QRCodeGenerator {
 
 	public  static String getChallenge() {
 
-		Dotenv dotenv = Dotenv.load();
-
-		String CompanyId = dotenv.get("HS_COMPANY_ID");
-		String Token = dotenv.get("HS_TOKEN");
-
 		try {
+			QRCodeGenerator obj = new QRCodeGenerator();
 
-			return challengeService(CompanyId,Token);
+			return challengeService(obj.CompanyId, obj.Token);
 
 		} catch (Exception e) {
 
@@ -56,8 +68,9 @@ public class QRCodeGenerator {
 
 	// HTTP POST request
 	private  static String challengeService(String companyId, String token) throws Exception {
+		QRCodeGenerator qrg = new QRCodeGenerator();
 
-		String url = "http://localhost:3000/challenge";
+		String url = qrg.BaseUri+"challenge";
 
 		StringBuilder response = new StringBuilder();
 		URL obj = new URL(url);
@@ -103,9 +116,22 @@ public class QRCodeGenerator {
 		return response.toString();
 	}
 
-	private static String verifyService(String companyId, String token, String signedRsv, String publicToken, String rawMsg) throws Exception {
+	private static String verifyNotifyService(String companyId, String token, String signedRsv, String publicToken, String rawMsg, String direction) throws Exception {
+		
+		QRCodeGenerator qrg = new QRCodeGenerator();
+		
+		String url = qrg.BaseUri;
 
-		String url = "http://localhost:3000/appLogin";
+		if(direction=="verify"){
+
+			 url = url+"appLogin";
+
+		} else if(direction == "notify"){
+
+			 url = url+"notifyTx";
+
+		}
+
 		StringBuilder response = new StringBuilder();
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
