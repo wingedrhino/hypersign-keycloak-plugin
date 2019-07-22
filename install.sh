@@ -32,6 +32,8 @@ case "$FINAL_STATUS" in
 	  echo '*********Container already built and running************'
 		##Every time you do the development, just run these two commands. Now all your configurations in keycloack will persisit
 		#copy new jar into container
+		echo 'Compiling and building the new HyperSignAuth jar'
+		mvn clean install
 		echo 'Deploying HyperSignAuth.jar into container...'
 		docker cp target/HyperSignAuth.jar $CONTAINER_NAME:/opt/jboss/keycloak/standalone/deployments
 		#restart the container

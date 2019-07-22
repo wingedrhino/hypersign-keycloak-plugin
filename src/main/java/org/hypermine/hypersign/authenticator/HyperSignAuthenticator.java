@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.hypermine.hypersing.authenticator;
+package org.hypermine.hypersign.authenticator;
 
 import org.jboss.resteasy.spi.HttpResponse;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -61,7 +61,7 @@ public class HyperSignAuthenticator implements Authenticator {
             return;
         }
         //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
-        Response challenge = context.form().createForm("secret-question.ftl");
+        Response challenge = context.form().createForm("hypersign.ftl");
         context.challenge(challenge);
         
         System.out.println("*********PRINTING THE ACTION URL THAT WILL BE USED BY HYPERSIGN MOBILE APP IN ORDER CALL THE KEYCLOAK ACTION************");
@@ -88,7 +88,7 @@ public class HyperSignAuthenticator implements Authenticator {
         if (!validated) {
             Response challenge =  context.form()
                     .setError("badSecret")
-                    .createForm("secret-question.ftl");
+                    .createForm("hyerpsign.ftl");
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;
         }
@@ -126,9 +126,9 @@ public class HyperSignAuthenticator implements Authenticator {
 
     protected boolean validateAnswer(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-        String secret = formData.getFirst("secret_answer");
+        String secret = formData.getFirst("QR_CODE");
         UserCredentialModel input = new UserCredentialModel();
-        input.setType(SecretQuestionCredentialProvider.SECRET_QUESTION);
+        input.setType(HyperSignCredentialProvider.QR_CODE);
         input.setValue(secret);
         return context.getSession().userCredentialManager().isValid(context.getRealm(), context.getUser(), input);
     }
@@ -149,12 +149,12 @@ public class HyperSignAuthenticator implements Authenticator {
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
         //return false;
-    	return session.userCredentialManager().isConfiguredFor(realm, user, SecretQuestionCredentialProvider.SECRET_QUESTION);
+    	return session.userCredentialManager().isConfiguredFor(realm, user, HyperSignCredentialProvider.QR_CODE);
     }
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-        user.addRequiredAction(SecretQuestionRequiredAction.PROVIDER_ID);
+        user.addRequiredAction(HyperSignRequiredAction.PROVIDER_ID);
     }
 
     @Override
