@@ -88,7 +88,7 @@ public class HyperSignAuthenticator implements Authenticator {
         if (!validated) {
             Response challenge =  context.form()
                     .setError("badSecret")
-                    .createForm("hyerpsign.ftl");
+                    .createForm("hypersign.ftl");
             context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
             return;
         }
