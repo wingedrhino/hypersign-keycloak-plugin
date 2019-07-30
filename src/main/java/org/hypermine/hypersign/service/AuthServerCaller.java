@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -31,7 +32,7 @@ public class AuthServerCaller {
 	public static String getChallenge() {
 
 		try {
-			
+
 			AuthServerCaller obj = new AuthServerCaller();
 
 			return challengeService(obj.CompanyId, obj.Token);
@@ -91,7 +92,7 @@ public class AuthServerCaller {
 			// System.out.println(response.toString());
 		}
 
-		return response.toString();
+		return qrg.parseResponse("challenge", response);
 	}
 
 	private static String verifyNotifyService(String companyId, String token, String signedRsv, String publicToken,
@@ -156,7 +157,24 @@ public class AuthServerCaller {
 			// System.out.println(response.toString());
 		}
 
-		return response.toString();
+		return qrg.parseResponse("challenge", response);
 	}
 
+	public static String parseResponse(String key, StringBuilder response) throws Exception {
+
+		JSONObject obj = new JSONObject(response.toString());
+
+		JSONArray arr = obj.getJSONArray("data");
+
+		String challenge = "";
+		for (int i = 0; i < arr.length(); i++) {
+
+			JSONObject attributes = arr.getJSONObject(i).getJSONObject("attributes");
+
+			challenge = attributes.getJSONObject("data").getString(key);
+
+		}
+
+		return challenge;
+	}
 }
