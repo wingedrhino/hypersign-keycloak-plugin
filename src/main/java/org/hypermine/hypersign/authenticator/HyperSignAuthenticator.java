@@ -43,6 +43,8 @@ public class HyperSignAuthenticator implements Authenticator {
 
     public static final String CREDENTIAL_TYPE = "hypersign_qrcode";
 
+    private KeycloakSession session;
+
     protected boolean hasCookie(AuthenticationFlowContext context) {
         Cookie cookie = context.getHttpRequest().getHttpHeaders().getCookies().get("HYPERSIGN_QRCODE_SOLVED");
         boolean result = cookie != null;
@@ -60,7 +62,7 @@ public class HyperSignAuthenticator implements Authenticator {
             context.success();
             return;
         }
-        //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
+        // String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
         Response challenge = context.form().createForm("hypersign.ftl");
         context.challenge(challenge);
         
@@ -76,9 +78,20 @@ public class HyperSignAuthenticator implements Authenticator {
      * ********************************************************************************/
     @Override
     public void action(AuthenticationFlowContext context) {
-    	
-    	
-    	System.out.println("*******I AM INSIDE THE ACTION CONTROLLER***********");
+        System.out.println("*******I AM INSIDE THE ACTION CONTROLLER***********");
+
+        String userId = "af050821-b777-45a8-a199-ae2947e1132d";
+        UserModel user = context.getSession().users().getUserById(userId, context.getRealm());
+
+        System.out.println("*******Looking for user session ***********");
+        System.out.println(user.getUsername());
+
+    	// UserModel user = session.users().getUserById(userId, context.getRealm());
+
+        System.out.println("*******Got the session***********");
+
+        // System.out.println(user.toString());
+        System.out.println("finish printing user");
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
             context.cancelLogin();

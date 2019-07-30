@@ -36,6 +36,7 @@ case "$FINAL_STATUS" in
 		mvn clean install
 		echo 'Deploying HyperSignAuth.jar into container...'
 		docker cp target/HyperSignAuth.jar $CONTAINER_NAME:/opt/jboss/keycloak/standalone/deployments
+		docker cp hypersign.ftl $CONTAINER_NAME:/opt/jboss/keycloak/themes/base/login
 		#restart the container
 		echo 'Restarting the container...'
 		docker restart $CONTAINER_NAME

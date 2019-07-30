@@ -9,8 +9,8 @@ ENV KEYCLOAK_USER admin
 ENV KEYCLOAK_PASSWORD admin
 
 COPY target/HyperSignAuth.jar /opt/jboss/keycloak/standalone/deployments
-COPY hyperpsign-config.ftl /opt/jboss/keycloak/themes/base/login
-COPY hyperpsign.ftl /opt/jboss/keycloak/themes/base/login
+COPY hypersign-config.ftl /opt/jboss/keycloak/themes/base/login
+COPY hypersign.ftl /opt/jboss/keycloak/themes/base/login
 
 EXPOSE 8080
 

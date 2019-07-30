@@ -31,6 +31,7 @@ public class AuthServerCaller {
 	public static String getChallenge() {
 
 		try {
+			
 			AuthServerCaller obj = new AuthServerCaller();
 
 			return challengeService(obj.CompanyId, obj.Token);
