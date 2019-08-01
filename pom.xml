@@ -31,19 +31,19 @@
     <packaging>jar</packaging>
 
     <dependencies>
-    <dependency>
-        <groupId>net.glxn.qrgen</groupId>
-        <artifactId>javase</artifactId>
-        <version>2.0</version>
-    </dependency>
-    <dependency>
+        <dependency>
+            <groupId>net.glxn.qrgen</groupId>
+            <artifactId>javase</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
         </dependency>
-    <dependency>
-    <groupId>com.google.zxing</groupId>
-    <artifactId>core</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
@@ -74,10 +74,11 @@
             <artifactId>java-dotenv</artifactId>
             <version>5.1.1</version>
         </dependency>
+       
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180130</version>
+            <version>20080701</version>
         </dependency>
     </dependencies>
 
@@ -98,6 +99,27 @@
                 <configuration>
                     <skip>false</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>net.glxn.qrgen:javase</include>
+                                    <include>org.json:json</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

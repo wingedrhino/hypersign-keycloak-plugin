@@ -1,8 +1,7 @@
 package org.hypermine.hypersign.authenticator;
 
 import org.hypermine.hypersign.service.AuthServerCaller;
-import org.json.JSONObject;
-import org.json.JSONArray;
+
 
 public class TestJson {
 

@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import io.github.cdimascio.dotenv.Dotenv;
+// import io.github.cdimascio.dotenv.Dotenv;
 
 public class AuthServerCaller {
 
@@ -20,13 +20,16 @@ public class AuthServerCaller {
 	private static String Token;
 
 	public AuthServerCaller() {
-		Dotenv dotenv = Dotenv.load();
+		// Dotenv dotenv = Dotenv.load();
 
-		this.BaseUri = dotenv.get("HS_BASE_URI");
+		// this.BaseUri = dotenv.get("HS_BASE_URI");
+		this.BaseUri = "http://localhost:3000/";
 
-		this.CompanyId = dotenv.get("HS_COMPANY_ID");
+		// this.CompanyId = dotenv.get("HS_COMPANY_ID");
+		this.CompanyId = "32";
 
-		this.Token = dotenv.get("HS_TOKEN");
+		// this.Token = dotenv.get("HS_TOKEN");
+		this.Token = "jhgjhjhfjhfjhfjjhf";
 	}
 
 	public static String getChallenge() {
