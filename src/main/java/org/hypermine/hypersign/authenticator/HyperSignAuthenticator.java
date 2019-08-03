@@ -71,10 +71,10 @@ public class HyperSignAuthenticator implements Authenticator {
         }
 
             
-        try {
+        // try {
      
             String response = "";
-            response = QRCodeGenerator.createQRLoginPage(context.getRealm().getDisplayName());
+            // response = QRCodeGenerator.createQRLoginPage(context.getRealm().getDisplayName());
           
             System.out.println("*********PRINTING THE CHALLENGE************");
             Map<String, String> params = new HashMap<String, String>();
@@ -91,13 +91,13 @@ public class HyperSignAuthenticator implements Authenticator {
                     "*********PRINTING THE ACTION URL THAT WILL BE USED BY HYPERSIGN MOBILE APP IN ORDER CALL THE KEYCLOAK ACTION************");
             System.out.println(context.getActionUrl(context.generateAccessCode()));
             context.form().setAttribute("hypersign", "This is for HyperSign testing");
-        } catch (WriterException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-        }
+        // } catch (WriterException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+		// } catch (IOException e) {
+		// 	// TODO Auto-generated catch block
+		// 	e.printStackTrace();
+        // }
         
     }
 
