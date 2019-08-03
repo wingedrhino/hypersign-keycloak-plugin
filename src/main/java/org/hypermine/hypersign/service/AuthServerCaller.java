@@ -48,6 +48,40 @@ public class AuthServerCaller {
 		}
 	}
 
+	/**
+	 * isValid
+	 * @param signedRsv
+	 * @param publicToken
+	 * @param rawMsg
+	 * @param direction
+	 * @return
+	 */
+	public static String isValid(
+		String signedRsv, 
+		String publicToken, 
+		String rawMsg, 
+		String direction) {
+
+		try {
+
+			AuthServerCaller obj = new AuthServerCaller();
+
+			return verifyNotifyService(
+					obj.CompanyId, 
+					obj.Token, 
+					signedRsv, 
+					publicToken,
+					rawMsg,
+					direction
+				);
+
+		} catch (Exception e) {
+
+			System.out.println("\nSending 'POST' request to URL : " + e);
+
+			return "CompanyId";
+		}
+	}
 	// HTTP POST request
 	private static String challengeService(String companyId, String token) throws Exception {
 		AuthServerCaller qrg = new AuthServerCaller();
@@ -98,6 +132,17 @@ public class AuthServerCaller {
 		return qrg.parseResponse("challenge", response);
 	}
 
+	/**
+	 * @reqiest post
+	 * @param companyId
+	 * @param token
+	 * @param signedRsv
+	 * @param publicToken
+	 * @param rawMsg
+	 * @param direction
+	 * @return
+	 * @throws Exception
+	 */
 	private static String verifyNotifyService(String companyId, String token, String signedRsv, String publicToken,
 			String rawMsg, String direction) throws Exception {
 

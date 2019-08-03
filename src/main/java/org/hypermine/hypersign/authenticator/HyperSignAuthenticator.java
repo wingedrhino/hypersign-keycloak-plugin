@@ -109,7 +109,8 @@ public class HyperSignAuthenticator implements Authenticator {
     public void action(AuthenticationFlowContext context) {
         System.out.println("*******I AM INSIDE THE ACTION CONTROLLER***********");
 
-        String userId = "af050821-b777-45a8-a199-ae2947e1132d";
+        //Added Static UserId
+        String userId = "530cbc89-33d3-414a-b1e6-6f7845e5e4a5";
         UserModel user = context.getSession().users().getUserById(userId, context.getRealm());
 
         System.out.println("*******Looking for user session ***********");
@@ -123,20 +124,41 @@ public class HyperSignAuthenticator implements Authenticator {
         System.out.println("finish printing user");
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
+            System.out.println("cancel");
             context.cancelLogin();
             return;
         }
-        boolean validated = validateAnswer(context);
+    
         // boolean validated = validateAnswer(context);
-        if (!validated) {
-            Response challenge =  context.form()
-                    .setError("badSecret")
-                    .createForm("hypersign.ftl");
-            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
-            return;
+        UserCredentialModel input = new UserCredentialModel();
+        // input.setType(HyperSignCredentialProvider.QR_CODE);xs
+        input.setValue("secret");
+
+        boolean result = true;
+        // try {
+        //     result = session.userCredentialManager().isValid(context.getRealm(), user, input);
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        //     // throw new AuthenticationFlowException("unknown user authenticated by the authenticator",
+        //     //         AuthenticationFlowError.UNKNOWN_USER);
+        // }
+        if (result) {
+            context.setUser(user);
+            setCookie(context);
+            context.success();
+        } else {
+            context.cancelLogin();
         }
-        setCookie(context);
-        context.success();
+
+        // if (!validated) {
+        //     Response challenge =  context.form()
+        //             .setError("badSecret")
+        //             .createForm("hypersign.ftl");
+        //     context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+        //     return;
+        // }
+        // setCookie(context);
+        // context.success();
     }
     /**********************************************************************************
      * Set the Hypersign cookie for 30 days.
@@ -167,13 +189,16 @@ public class HyperSignAuthenticator implements Authenticator {
     }
 
 
-    protected boolean validateAnswer(AuthenticationFlowContext context) {
-        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-        String secret = formData.getFirst("QR_CODE");
+    protected boolean validateAnswer(AuthenticationFlowContext context, UserModel user) {
+        // MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+        // String secret = formData.getFirst("QR_CODE");
+        // System.out.println("secret");
+        // System.out.println(secret);
+
         UserCredentialModel input = new UserCredentialModel();
         // input.setType(HyperSignCredentialProvider.QR_CODE);xs
-        input.setValue(secret);
-        return context.getSession().userCredentialManager().isValid(context.getRealm(), context.getUser(), input);
+        input.setValue("secret");
+        return context.getSession().userCredentialManager().isValid(context.getRealm(), user, input);
     }
 
     /**********************************************************************************
