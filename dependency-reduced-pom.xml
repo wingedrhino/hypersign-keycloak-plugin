@@ -38,7 +38,6 @@
             <configuration>
               <artifactSet>
                 <includes>
-                  <include>net.glxn.qrgen:javase</include>
                   <include>org.json:json</include>
                 </includes>
               </artifactSet>
@@ -48,6 +47,12 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>com.google.zxing</groupId>

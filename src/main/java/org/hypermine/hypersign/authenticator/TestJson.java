@@ -1,14 +1,23 @@
 package org.hypermine.hypersign.authenticator;
 
-import org.hypermine.hypersign.service.AuthServerCaller;
+import java.io.IOException;
 
+import com.google.zxing.WriterException;
 
 public class TestJson {
 
 	public static void main(String[] args) {
-		AuthServerCaller authserCaller = new AuthServerCaller();
+		String response="";
+		try {
+			response = QRCodeGenerator.createQRLoginPage("Hypermine");
+		} catch (WriterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		String response = authserCaller.getChallenge();
 		// // Object o1 = JSONValue.parse(response);
 		// JSONObject jsonObject = new JSONObject(response);
 

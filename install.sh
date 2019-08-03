@@ -47,6 +47,10 @@ case "$FINAL_STATUS" in
 		#Removing exiting container
 		echo 'Removing exiting container...'
 		docker rm -f hypersign 
+
+		# docker cp target/HyperSignAuth.jar $CONTAINER_NAME:/opt/jboss/keycloak/standalone/deployments
+		# docker cp hypersign.ftl $CONTAINER_NAME:/opt/jboss/keycloak/themes/base/login
+		#restart the container
 		#run the container
 		echo 'Running the container...'
 		docker run -p 8080:8080 --name $CONTAINER_NAME -d hypermine/hypersign

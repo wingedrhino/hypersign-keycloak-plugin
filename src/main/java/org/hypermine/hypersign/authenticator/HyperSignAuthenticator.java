@@ -23,6 +23,7 @@ import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.common.util.ServerCookie;
+import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -33,7 +34,13 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+
+import com.google.zxing.WriterException;
+
+import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -63,24 +70,40 @@ public class HyperSignAuthenticator implements Authenticator {
             return;
         }
 
-        String response = QRCodeGenerator.createQRLoginPage(context.getRealm().getDisplayName());
+            
+        try {
+     
+            String response = "";
+            response = QRCodeGenerator.createQRLoginPage(context.getRealm().getDisplayName());
+          
+            System.out.println("*********PRINTING THE CHALLENGE************");
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("base64Image", response);
 
-        System.out.println("*********PRINTING THE CHALLENGE************");
+            System.out.println("*********Addinng the CHallenge in the Form************");
+            LoginFormsProvider form = context.form();
+            params.forEach(form::setAttribute);
 
-        System.out.println(response);
+            Response challenge = context.form().createForm("hypersign.ftl");
+            context.challenge(challenge);
 
-        Response challenge = context.form().createForm("hypersign.ftl");
-        context.challenge(challenge);
+            System.out.println(
+                    "*********PRINTING THE ACTION URL THAT WILL BE USED BY HYPERSIGN MOBILE APP IN ORDER CALL THE KEYCLOAK ACTION************");
+            System.out.println(context.getActionUrl(context.generateAccessCode()));
+            context.form().setAttribute("hypersign", "This is for HyperSign testing");
+        } catch (WriterException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+        }
         
-        System.out.println("*********PRINTING THE ACTION URL THAT WILL BE USED BY HYPERSIGN MOBILE APP IN ORDER CALL THE KEYCLOAK ACTION************");
-        System.out.println(context.getActionUrl(context.generateAccessCode()));
-        context.form().setAttribute("hypersign", "This is for HyperSign testing");
     }
 
     /**********************************************************************************
      * This is the main method that will get called once user solves the challenge and 
      * click on the submit button.
-     * 
      * ********************************************************************************/
     @Override
     public void action(AuthenticationFlowContext context) {
@@ -104,6 +127,7 @@ public class HyperSignAuthenticator implements Authenticator {
             return;
         }
         boolean validated = validateAnswer(context);
+        // boolean validated = validateAnswer(context);
         if (!validated) {
             Response challenge =  context.form()
                     .setError("badSecret")
@@ -147,7 +171,7 @@ public class HyperSignAuthenticator implements Authenticator {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String secret = formData.getFirst("QR_CODE");
         UserCredentialModel input = new UserCredentialModel();
-        input.setType(HyperSignCredentialProvider.QR_CODE);
+        // input.setType(HyperSignCredentialProvider.QR_CODE);xs
         input.setValue(secret);
         return context.getSession().userCredentialManager().isValid(context.getRealm(), context.getUser(), input);
     }
@@ -167,13 +191,13 @@ public class HyperSignAuthenticator implements Authenticator {
      * ********************************************************************************/
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
-        //return false;
-    	return session.userCredentialManager().isConfiguredFor(realm, user, HyperSignCredentialProvider.QR_CODE);
+        return false;
+    	// return session.userCredentialManager().isConfiguredFor(realm, user, HyperSignCredentialProvider.QR_CODE);
     }
 
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-        user.addRequiredAction(HyperSignRequiredAction.PROVIDER_ID);
+        // user.addRequiredAction(HyperSignRequiredAction.PROVIDER_ID);
     }
 
     @Override

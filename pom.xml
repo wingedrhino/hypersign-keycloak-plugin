@@ -31,11 +31,16 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
+        <!-- <dependency>
             <groupId>net.glxn.qrgen</groupId>
             <artifactId>javase</artifactId>
             <version>2.0</version>
-        </dependency>
+        </dependency> -->
+        <!-- <dependency>
+            <groupId>com.github.kenglxn.qrgen</groupId>
+            <artifactId>javase</artifactId>
+            <version>2.6.0</version>
+        </dependency> -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
@@ -81,7 +86,12 @@
             <version>20080701</version>
         </dependency>
     </dependencies>
-
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <build>
         <finalName>HyperSignAuth</finalName>
         <plugins>
@@ -113,7 +123,6 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>net.glxn.qrgen:javase</include>
                                     <include>org.json:json</include>
                                 </includes>
                             </artifactSet>
