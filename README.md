@@ -17,13 +17,23 @@ mvn -version
 
 **Setup [keycloak](https://github.com/keycloak/keycloak)**
 
+using code
+
 ```
+## clone
 git clone https://github.com/keycloak/keycloak
 cd keycloak
-mvn clean install -DskipTests
+
+## build and install
+mvn -Pdistribution -pl distribution/server-dist -am -Dmaven.test.skip clean install
+
+## untar and runs
+tar xfz distribution/server-dist/target/keycloak-<VERSION>.tar.gz 
+cd keycloak-<VERSION>
+bin/standalone.sh
 ```
 
-OR
+OR using docker
 
 ```
 ./install.sh
