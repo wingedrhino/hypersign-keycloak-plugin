@@ -27,8 +27,10 @@ cd keycloak
 ## build and install
 mvn -Pdistribution -pl distribution/server-dist -am -Dmaven.test.skip clean install
 
-## untar and runs
+## untar
 tar xfz distribution/server-dist/target/keycloak-<VERSION>.tar.gz 
+
+## run server
 cd keycloak-<VERSION>
 bin/standalone.sh
 ```
@@ -41,7 +43,10 @@ OR using docker
 
 This will pull and run keycloak docker from keycloack repo. 
 
-Note*: In case you get any error, re-run the command once again.
+*Note*: 
+
+- In case you get any error, re-run the command once again.
+- The keycloack server should run on http://localhost:8080
 
 ## Setup `hs-autenticator` project on Eclipse
 
@@ -80,5 +85,14 @@ Go to the `hs-authenticator/target` folder, you should see new jar created.
    Click on the Register button and choose your new Required Action.
    Your new required action should now be displayed and enabled in the required actions list.
 
+
+## As is highlevel keycloak flow
+
+![As-Is-flow.jpg](docs/As-Is-flow.jpg)
+
+
+## Hypersign Keycloack authentication workflow
+
+![hs-kc-e2e-flow.jpg](docs/hs-kc-e2e-flow.jpg)
 
 
