@@ -78,12 +78,6 @@ Copy `HyperSignAuth.jar` from `hs-authenticator/target`  to `$KEYCLOAK_HOME/` th
 
 ```
 
-And finally update `standalone.xml` file present in `$KEYCLOAK_HOME/standalone/configuration/` directory.
-
-```
-<provider>module:hypersign-plugin</provider>
-```
-
 3. Copy the `hyerpsign-config.ftl` and `hyerpsign.ftl` files to the themes/base/login directory.
 
 4. Login to admin console.  Hit browser refresh if you are already logged in so that the new providers show up.
