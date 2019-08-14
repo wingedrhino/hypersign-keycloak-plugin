@@ -69,7 +69,20 @@ Go to the `hs-authenticator/target` folder, you should see new `HyperSignAuth.ja
    
    To install using Docker Container https://hub.docker.com/r/jboss/keycloak/
 
-2. Take the jar file and put it under the `keycloak/standalone/deployments` folder.
+2. 
+
+Copy `HyperSignAuth.jar` from `hs-authenticator/target`  to `$KEYCLOAK_HOME/` then run the following command
+
+```sh
+./bin/jboss-cli.sh --command="module add --name=hypersign-plugin --resources=./HyperSignAuth.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.ws.rs.api,net.glxn.qrgen.javase,com.google.zxing.javase,com.google.zxing.core"
+
+```
+
+And finally update `standalone.xml` file present in `$KEYCLOAK_HOME/standalone/configuration/` directory.
+
+```
+<provider>module:hypersign-plugin</provider>
+```
 
 3. Copy the `hyerpsign-config.ftl` and `hyerpsign.ftl` files to the themes/base/login directory.
 
