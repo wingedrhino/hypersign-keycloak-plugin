@@ -57,9 +57,9 @@ This will pull and run keycloak docker from keycloack repo.
 
 ```
 cd hs-authenticator
-mvn clean install
+mvn package
 ```
-Go to the `hs-authenticator/target` folder, you should see new jar created.
+Go to the `hs-authenticator/target` folder, you should see new `HyperSignAuth.jar` created.
 
 > You can also build hs-authenticator directly from eclipse
 
