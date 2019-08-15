@@ -4,3 +4,4 @@ keycloak/*
 .sts4-cache
 target
 .settings
+dist
