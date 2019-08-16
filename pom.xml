@@ -1,35 +1,43 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <name>Hypersign Plugin Keycloak Parent</name>
+    <name>HANKO Plugin Keycloak Parent</name>
     <description/>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.hypermine.hypersign.plugin</groupId>
+    <groupId>io.hanko.plugins.keycloak</groupId>
     <version>0.2-SNAPSHOT</version>
-    <artifactId>hs-plugin-keycloak-parent</artifactId>
+    <artifactId>hanko-plugin-keycloak-parent</artifactId>
     <packaging>pom</packaging>
 
+    <licenses>
+            <license>
+                <name>Apache License, Version 2.0.0</name>
+                <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+                <distribution>repo</distribution>
+            </license>
+        </licenses>
+
     <properties>
-        <version.keycloak>6.0.1</version.keycloak>
+        <version.keycloak>4.8.3.Final</version.keycloak>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- <dependency>
+            <dependency>
                 <groupId>org.keycloak.bom</groupId>
                 <artifactId>keycloak-spi-bom</artifactId>
                 <version>${version.keycloak}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency> -->
+            </dependency>
             <dependency>
-                <groupId>org.hypermine.hypersign.plugin</groupId>
-                <artifactId>hs-plugin-keycloak-ejb</artifactId>
+                <groupId>io.hanko.plugins.keycloak</groupId>
+                <artifactId>hanko-plugin-keycloak-ejb</artifactId>
                 <version>${project.version}</version>
                 <type>ejb</type>
             </dependency>
-            <!-- <dependency>
+            <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-server-spi-private</artifactId>
                 <scope>provided</scope>
@@ -56,12 +64,12 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>5.1.15.Final</version>
-            </dependency> -->
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
-        <module>hs-plugin-keycloak-ejb</module>
-        <module>hs-plugin-keycloak-ear</module>
+        <module>hanko-plugin-keycloak-ejb</module>
+        <module>hanko-plugin-keycloak-ear</module>
     </modules>
 </project>
