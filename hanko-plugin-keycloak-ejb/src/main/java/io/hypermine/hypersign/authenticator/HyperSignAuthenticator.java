@@ -76,24 +76,58 @@ public class HyperSignAuthenticator implements Authenticator {
      * ********************************************************************************/
     @Override
     public void action(AuthenticationFlowContext context) {
-    	
-    	
-    	System.out.println("*******I AM INSIDE THE ACTION CONTROLLER***********");
+        System.out.println("*******I AM INSIDE THE ACTION CONTROLLER***********");
+
+        //Added Static UserId
+        String userId = "65fa0884-24ae-4c25-9260-df0f170290dc";
+        UserModel user = context.getSession().users().getUserById(userId, context.getRealm());
+
+        System.out.println("*******Looking for user session ***********");
+        System.out.println(user.getUsername());
+
+    	// UserModel user = session.users().getUserById(userId, context.getRealm());
+
+        System.out.println("*******Got the session***********");
+
+        // System.out.println(user.toString());
+        System.out.println("finish printing user");
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
+            System.out.println("cancel");
             context.cancelLogin();
             return;
         }
-        boolean validated = validateAnswer(context);
-        if (!validated) {
-            Response challenge =  context.form()
-                    .setError("badSecret")
-                    .createForm("hypersign.ftl");
-            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
-            return;
+    
+        // boolean validated = validateAnswer(context);
+        UserCredentialModel input = new UserCredentialModel();
+        // input.setType(HyperSignCredentialProvider.QR_CODE);xs
+        input.setValue("secret");
+
+        boolean result = true;
+        // try {
+        //     result = session.userCredentialManager().isValid(context.getRealm(), user, input);
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        //     // throw new AuthenticationFlowException("unknown user authenticated by the authenticator",
+        //     //         AuthenticationFlowError.UNKNOWN_USER);
+        // }
+        if (result) {
+            context.setUser(user);
+            setCookie(context);
+            context.success();
+        } else {
+            context.cancelLogin();
         }
-        setCookie(context);
-        context.success();
+
+        // if (!validated) {
+        //     Response challenge =  context.form()
+        //             .setError("badSecret")
+        //             .createForm("hypersign.ftl");
+        //     context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+        //     return;
+        // }
+        // setCookie(context);
+        // context.success();
     }
     /**********************************************************************************
      * Set the Hypersign cookie for 30 days.

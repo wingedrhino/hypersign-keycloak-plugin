@@ -21,15 +21,16 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.ServicesLogger;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+// import javax.ws.rs.POST;
+// import javax.ws.rs.Produces;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 public class HSResourceProvider implements RealmResourceProvider {
     private static ServicesLogger logger = ServicesLogger.LOGGER;
-
+    private static Boolean signature = false;
     private KeycloakSession session;
 
     public HSResourceProvider(KeycloakSession session) {
@@ -50,6 +51,26 @@ public class HSResourceProvider implements RealmResourceProvider {
             name = session.getContext().getRealm().getName();
         }
         return "Hello " + name;
+    }
+
+    @GET
+    @Path("listen")
+    @Produces("text/plain; charset=utf-8")
+    public String listen() {
+        // logger.info("list api get called");
+        // String name = session.getContext().getRealm().getDisplayName();
+        // if (name == null) {
+        //     name = session.getContext().getRealm().getName();
+        // }
+        return signature.toString();
+    }
+
+    @POST
+    @Path("sign")
+    @Produces("text/plain; charset=utf-8")
+    public String post() {
+        signature = true;
+       return signature.toString();
     }
 
     @Override
