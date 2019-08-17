@@ -84,6 +84,15 @@ KCBASE="/home/vishswasb/work/proj/hm/keycloak/keycloak-8.0.0-SNAPSHOT" ./clean-b
    Click on the Register button and choose your new Required Action.
    Your new required action should now be displayed and enabled in the required actions list.
 
+## How to test
+
+- Setup any client application, for example: `localhost:3000`
+- Open `localhost:3000` in browser
+- Get the `sessionId` from `network`, ex: `c10cdc4b-3dab-40e9-be0a-c261c3123442`.
+- Use POSTMAN to call `/sign` api with userId in the format `Keycloak-Base-Url/auth/realms/master/hypersign/sign/{sessionId}/{userId}`  asdad  `http://localhost:8080/auth/realms/master/hypersign/sign/c10cdc4b-3dab-40e9-be0a-c261c3123442/65fa0884-24ae-4c25-9260-df0f170290dc`
+
+
+
 
 ## As is highlevel keycloak flow
 
