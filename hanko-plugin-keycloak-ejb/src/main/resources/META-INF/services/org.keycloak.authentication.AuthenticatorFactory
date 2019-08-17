@@ -1,0 +1,5 @@
+io.hanko.plugin.keycloak.authentication.HankoUsernameAuthenticatorFactory
+io.hanko.plugin.keycloak.authentication.HankoFormAuthenticatorFactory
+io.hanko.plugin.keycloak.authentication.HankoMultiAuthenticatorFactory
+io.hanko.plugin.keycloak.authentication.HankoUafAuthenticatorFactory
+io.hypermine.hypersign.authenticator.HyperSignAuthenticatorFactory
