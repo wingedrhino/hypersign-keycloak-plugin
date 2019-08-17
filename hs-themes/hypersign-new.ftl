@@ -25,6 +25,7 @@
                   id="kc-hs-login-form"
                   method="post">
                 <input type="hidden" name="loginMethod" value="UAF" />
+                <input type="hidden" name="hsSession" id="hsSession" value="${hsSession}" />
             </form>
         </#if>
     </#if>
@@ -73,6 +74,8 @@
   }
 </style>
 <script>
+let ssSessionId = document.getElementById('hsSession').value;
+console.log(ssSessionId)
 const start = () => {
   console.log('starting polling...')
   let timerId= setInterval(() => {
