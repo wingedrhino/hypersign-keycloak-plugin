@@ -61,7 +61,7 @@ public class HyperSignAuthenticator implements Authenticator {
             return;
         }
         //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
-        Response challenge = context.form().createForm("hypersign.ftl");
+        Response challenge = context.form().setAttribute("loginMethod", "UAF").createForm("hypersign-new.ftl");
         context.challenge(challenge);
         
         System.out.println("*********PRINTING THE ACTION URL THAT WILL BE USED BY HYPERSIGN MOBILE APP IN ORDER CALL THE KEYCLOAK ACTION************");
@@ -79,7 +79,7 @@ public class HyperSignAuthenticator implements Authenticator {
         System.out.println("*******I AM INSIDE THE ACTION CONTROLLER***********");
 
         //Added Static UserId
-        String userId = "65fa0884-24ae-4c25-9260-df0f170290dc";
+        String userId = "64ecaa15-4be3-49db-b56d-c171d021a346";
         UserModel user = context.getSession().users().getUserById(userId, context.getRealm());
 
         System.out.println("*******Looking for user session ***********");

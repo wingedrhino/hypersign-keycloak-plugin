@@ -69,8 +69,8 @@ public class HSResourceProvider implements RealmResourceProvider {
     @Path("sign")
     @Produces("text/plain; charset=utf-8")
     public String post() {
-        signature = true;
-       return signature.toString();
+      signature = true;
+      return signature.toString();
     }
 
     @Override
