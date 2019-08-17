@@ -28,6 +28,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.services.ServicesLogger;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -44,6 +45,7 @@ import io.hypermine.hypersign.service.AuthServerCaller;
 public class HyperSignAuthenticator implements Authenticator {
 
     public static final String CREDENTIAL_TYPE = "hypersign_qrcode";
+    private static ServicesLogger logger = ServicesLogger.LOGGER;
 
     protected boolean hasCookie(AuthenticationFlowContext context) {
         Cookie cookie = context.getHttpRequest().getHttpHeaders().getCookies().get("HYPERSIGN_QRCODE_SOLVED");
@@ -58,80 +60,27 @@ public class HyperSignAuthenticator implements Authenticator {
      * ********************************************************************************/
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+        logger.info("HyperSignAuthenticator :: authenticate : starts");
         if (hasCookie(context)) {
             context.success();
             return;
         }
-         String newHsSession = "ssssss";
         //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
-        Response challenge = context.form().setAttribute("loginMethod", "UAF").setAttribute("hsSession",newHsSession).createForm("hypersign-new.ftl");
+        Response challenge = getChallenge(context);
         context.challenge(challenge);
-        
-        System.out.println("*********PRINTING THE ACTION URL THAT WILL BE USED BY HYPERSIGN MOBILE APP IN ORDER CALL THE KEYCLOAK ACTION************");
-        System.out.println(context.getActionUrl(context.generateAccessCode()));
+        // System.out.println(context.getActionUrl(context.generateAccessCode()));
         context.form().setAttribute("hypersign", "This is for HyperSign testing");
+        logger.info("HyperSignAuthenticator :: authenticate : ends");
     }
 
-    @Override
-    public void authenticate(AuthenticationFlowContext context) {
-        if (hasCookie(context)) {
-            context.success();
-            return;
-        }
-        try{
-            String url = "http://localhost:8080/auth/realms/master/hypersign/session";
-            String newHSsession = AuthServerCaller.GetNewHSSession(url);
-            System.out.println("Getting session from api");
-            System.out.println(newHSsession);
-            //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
-            Response challenge = context.form().setAttribute("loginMethod", "UAF").setAttribute("hsSession",newHsSession).createForm("hypersign-new.ftl");
-            context.challenge(challenge);
-            
-            System.out.println(context.getActionUrl(context.generateAccessCode()));
-            context.form().setAttribute("hypersign", "This is for HyperSign testing");
-        }catch(Exception e){
-            System.out.println("Error occured");
-        }
+    protected Response getChallenge(AuthenticationFlowContext context){
+        logger.info("HyperSignAuthenticator :: getChallenge : starts");
+        String url = "http://localhost:8080/auth/realms/master/hypersign/session";
+        // blocking call to get new session
+        String newHSsession = callAPi(url);
+        Response challenge = context.form().setAttribute("loginMethod", "UAF").setAttribute("hsSession",newHSsession).createForm("hypersign-new.ftl");    
+        return challenge;
     }
-
-    /**********************************************************************************
-     * This is the main method that will get called once user solves the challenge and 
-     * click on the submit button.
-     * 
-     * ********************************************************************************/
-    // @Override
-    // public void action(AuthenticationFlowContext context) {
-    //     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-
-    //     if (formData.containsKey("cancel")) {
-    //         context.resetFlow();
-    //         return;
-    //     }
-
-    //     logger.error("waiting for challenge response");
-
-    //     // get current Hanko request ID
-    //     UserModel currentUser = context.getUser();
-    //     String hankoRequestId = userStore.getHankoRequestId(currentUser);
-
-    //     try {
-    //         // get Hanko API key from the Hanko UAF Authenticator configuration
-    //         HankoClientConfig config = HankoUtils.createConfig(context.getSession());
-
-    //         // blocking call to Hanko API
-    //         HankoRequest hankoRequest = hankoClient.awaitConfirmation(config, hankoRequestId);
-
-    //         if (hankoRequest.isConfirmed()) {
-    //             context.success();
-    //         } else {
-    //             logger.warn("Authentication failed for user " + context.getUser().getUsername());
-    //             cancelLogin(context);
-    //         }
-    //     } catch (Exception ex) {
-    //         logger.error("Hanko request verification failed.", ex);
-    //         cancelLogin(context);
-    //     }
-    // }
 
     /**********************************************************************************
      * This is the main method that will get called once user solves the challenge and 
@@ -140,59 +89,74 @@ public class HyperSignAuthenticator implements Authenticator {
      * ********************************************************************************/
     @Override
     public void action(AuthenticationFlowContext context) {
-        System.out.println("*******I AM INSIDE THE ACTION CONTROLLER***********");
-
-        //Added Static UserId
-        String userId = "64ecaa15-4be3-49db-b56d-c171d021a346";
-        UserModel user = context.getSession().users().getUserById(userId, context.getRealm());
-
-        System.out.println("*******Looking for user session ***********");
-        System.out.println(user.getUsername());
-
-    	// UserModel user = session.users().getUserById(userId, context.getRealm());
-
-        System.out.println("*******Got the session***********");
-
-        // System.out.println(user.toString());
-        System.out.println("finish printing user");
+        logger.info("HyperSignAuthenticator :: action : starts");
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         if (formData.containsKey("cancel")) {
-            System.out.println("cancel");
             context.cancelLogin();
             return;
         }
-    
-        // boolean validated = validateAnswer(context);
-        UserCredentialModel input = new UserCredentialModel();
-        // input.setType(HyperSignCredentialProvider.QR_CODE);xs
-        input.setValue("secret");
+        logger.info("HyperSignAuthenticator :: action : before validateUser call");
+        boolean validated = validateUser(context);
+        logger.info("HyperSignAuthenticator :: action : after validateUser call");
+        if (!validated) {
+            Response challenge = getChallenge(context);
+            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
+        }
+        logger.info("HyperSignAuthenticator :: action : ends");
+    }
 
-        boolean result = true;
-        // try {
-        //     result = session.userCredentialManager().isValid(context.getRealm(), user, input);
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        //     // throw new AuthenticationFlowException("unknown user authenticated by the authenticator",
-        //     //         AuthenticationFlowError.UNKNOWN_USER);
-        // }
-        if (result) {
+    private String callAPi(String url){
+        try{
+            logger.info("HyperSignAuthenticator :: callApi : start");
+            logger.info("HyperSignAuthenticator :: callApi : url :");
+            logger.info(url);
+            return AuthServerCaller.getApiCall(url);
+        }catch(Exception e){
+            logger.error(e);
+            return "";
+        }
+    }
+
+    private boolean validateUser(AuthenticationFlowContext context) {
+        logger.info("HyperSignAuthenticator :: validateUser : starts ");
+        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+        Boolean isValid = false;
+        String url = "";
+        String sessionId = formData.getFirst("sessionId");
+        logger.info("HyperSignAuthenticator :: validateUser : sessionId :");
+        logger.info(sessionId);
+        String userIdFromForm = formData.getFirst("userId");
+        logger.info("HyperSignAuthenticator :: validateUser : userId :");
+        logger.info(userIdFromForm);
+        // check if this user is correct from api call;
+        // blocking api call
+        url = "http://localhost:8080/auth/realms/master/hypersign/listen/" + "success/" + sessionId;
+        String userIdFromAPi = callAPi(url);
+        logger.info(userIdFromAPi);
+        if(userIdFromAPi.equals(userIdFromForm)){
+            logger.info("HyperSignAuthenticator :: validateUser : User is valid");
+
+            UserCredentialModel input = new UserCredentialModel();
+            // input.setType(SecretQuestionCredentialProvider.QR_CODE);
+            input.setValue("secret");
+        
+            UserModel user = context.getSession().users().getUserById(userIdFromAPi, context.getRealm());
             context.setUser(user);
             setCookie(context);
             context.success();
-        } else {
+            isValid = true;
+        }else{
+            logger.info("HyperSignAuthenticator :: validateUser : User is not valid");
+            logger.info("HyperSignAuthenticator :: validateUser : Clear session of this user");
+            // clear session in case of failure
+            url = "http://localhost:8080/auth/realms/master/hypersign/listen/" + "fail/" +sessionId;
+            callAPi(url);
             context.cancelLogin();
         }
-
-        // if (!validated) {
-        //     Response challenge =  context.form()
-        //             .setError("badSecret")
-        //             .createForm("hypersign.ftl");
-        //     context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, challenge);
-        //     return;
-        // }
-        // setCookie(context);
-        // context.success();
+        logger.info("HyperSignAuthenticator :: validateUser : ends ");
+        return isValid;
     }
+    
     /**********************************************************************************
      * Set the Hypersign cookie for 30 days.
      * 
@@ -219,16 +183,6 @@ public class HyperSignAuthenticator implements Authenticator {
         ServerCookie.appendCookieValue(cookieBuf, 1, name, value, path, domain, comment, maxAge, secure, httpOnly);
         String cookie = cookieBuf.toString();
         response.getOutputHeaders().add(HttpHeaders.SET_COOKIE, cookie);
-    }
-
-
-    protected boolean validateAnswer(AuthenticationFlowContext context) {
-        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-        String secret = formData.getFirst("QR_CODE");
-        UserCredentialModel input = new UserCredentialModel();
-        input.setType(HyperSignCredentialProvider.QR_CODE);
-        input.setValue(secret);
-        return context.getSession().userCredentialManager().isValid(context.getRealm(), context.getUser(), input);
     }
 
     /**********************************************************************************

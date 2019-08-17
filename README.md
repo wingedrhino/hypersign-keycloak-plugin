@@ -53,42 +53,34 @@ This will pull and run keycloak docker from keycloack repo.
 1. Open Eclipse IDE and select *Import exisiting maven project*
 2. Browse the folder where hs-authenticator is already downloaded and import it to your eclipse worksapce.
 
-## Build `hs-autenticator`
+
+## Build and run hs-authenticator
+
+Set in the `bashrc`
 
 ```
-cd hs-authenticator
-mvn package
+vim ~/.bashrc
+## set the KCBASE vairable
+export KCBASE="/home/vishswasb/work/proj/hm/keycloak/keycloak-8.0.0-SNAPSHOT"
+source ~/.bashrc
+
+./clean-build-install.sh
 ```
-Go to the `hs-authenticator/target` folder, you should see new `HyperSignAuth.jar` created.
+or run directly
 
-> You can also build hs-authenticator directly from eclipse
-
-## Setup `hs-autenticator` jar in Keycloak 
-
-1. First, Keycloak must be running.
-   
-   To install using Docker Container https://hub.docker.com/r/jboss/keycloak/
-
-2. 
-
-Copy `HyperSignAuth.jar` from `hs-authenticator/target`  to `$KEYCLOAK_HOME/` then run the following command
-
-```sh
-./bin/jboss-cli.sh --command="module add --name=hypersign-plugin --resources=./HyperSignAuth.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.ws.rs.api,net.glxn.qrgen.javase,com.google.zxing.javase,com.google.zxing.core"
+```
+KCBASE="/home/vishswasb/work/proj/hm/keycloak/keycloak-8.0.0-SNAPSHOT" ./clean-build-install.sh
 
 ```
 
-3. Copy the `hyerpsign-config.ftl` and `hyerpsign.ftl` files to the themes/base/login directory.
+## Configuring HS authn in Keycloack
 
-4. Login to admin console.  Hit browser refresh if you are already logged in so that the new providers show up.
-
-5. Go to the Authentication menu item and go to the Flow tab, you will be able to view the currently
+- Login to admin console.  Hit browser refresh if you are already logged in so that the new providers show up.
+- Go to the Authentication menu item and go to the Flow tab, you will be able to view the currently
    defined flows.  You cannot modify an built in flows, so, to add the Authenticator you
    have to copy an existing flow or create your own.  Copy the "Browser" flow.
-
-6. In your copy, click the "Actions" menu item and "Add Execution".  Pick Secret Question
-
-7. Next you have to register the required action that you created. Click on the Required Actions tab in the Authenticaiton menu.
+- In your copy, click the "Actions" menu item and "Add Execution".  Pick Secret Question
+- Next you have to register the required action that you created. Click on the Required Actions tab in the Authenticaiton menu.
    Click on the Register button and choose your new Required Action.
    Your new required action should now be displayed and enabled in the required actions list.
 

@@ -44,7 +44,7 @@ public class AuthServerCaller {
 	// }
 
 	// HTTP GET request
-	public static String GetNewHSSession(String url) throws Exception {
+	public static String getApiCall(String url) throws Exception {
 		
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -72,7 +72,6 @@ public class AuthServerCaller {
 		//print result
 		return response.toString();
 	}
-
 
 	// // HTTP POST request
 	// public void challengeService() throws Exception {

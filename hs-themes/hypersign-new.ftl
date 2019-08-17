@@ -25,7 +25,8 @@
                   id="kc-hs-login-form"
                   method="post">
                 <input type="hidden" name="loginMethod" value="UAF" />
-                <input type="hidden" name="hsSession" id="hsSession" value="${hsSession}" />
+                <input type="hidden" name="sessionId" id="hsSession" value="${hsSession}" />
+                <input type="hidden" name="userId" id="hsUserId" value="" />
             </form>
         </#if>
     </#if>
@@ -74,16 +75,17 @@
   }
 </style>
 <script>
-let ssSessionId = document.getElementById('hsSession').value;
-console.log(ssSessionId)
 const start = () => {
   console.log('starting polling...')
   let timerId= setInterval(() => {
     console.log('tick')
-    axios.get('http://localhost:8080/auth/realms/master/hypersign/listen')
+    let ssSessionId = document.getElementById('hsSession').value;
+    const url  = 'http://localhost:8080/auth/realms/master/hypersign/listen/success/' + ssSessionId;
+    axios.get(url)
     .then(response => {
-      if(response.data){
+      if(response.data != ""){
         clearInterval(timerId);
+        document.getElementById('hsUserId').value = response.data;
         document.getElementById('kc-hs-login-form').submit();
       }
       console.log(response.data)

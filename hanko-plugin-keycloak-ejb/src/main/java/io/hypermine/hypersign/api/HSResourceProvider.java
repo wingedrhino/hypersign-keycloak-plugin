@@ -22,8 +22,11 @@ import org.keycloak.services.ServicesLogger;
 import org.keycloak.models.*;
 import java.util.HashMap; 
 import java.util.Map;
-import javax.ws.rs.*;
 import java.util.UUID;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+// import javax.json.JSONObject;
 // import javax.ws.rs.POST;
 // import javax.ws.rs.Produces;
 
@@ -34,15 +37,15 @@ public class HSResourceProvider implements RealmResourceProvider {
 
     class HSUserModel {
         String userId;
-        Boolean hasLoggedIn;
-        public HSUserModel(String userId, Boolean hasLoggedIn){
+        boolean hasLoggedIn;
+        public HSUserModel(String userId, boolean hasLoggedIn){
             this.userId = userId;
             this.hasLoggedIn = hasLoggedIn;
         }
     }
 
     private static ServicesLogger logger = ServicesLogger.LOGGER;
-    private static HashMap<String, HSUserModel> userSessionMap =  new HashMap<>();// this is temporary
+    private static HashMap<String, HSUserModel> userSessionMap = new HashMap<>();// this is temporary
     private KeycloakSession session;
 
     public HSResourceProvider(KeycloakSession session) {
@@ -66,17 +69,25 @@ public class HSResourceProvider implements RealmResourceProvider {
     }
 
     @GET
-    @Path("auth/{sessionId}")
+    @Path("listen/{status}/{sessionId}")
     @Produces("text/plain; charset=utf-8")
-    public String listen(@PathParam("sessionId") String sessionId) {
-        Boolean userAuthenticated = false;
-        if (userSessionMap.containsKey(sessionId) && userSessionMap.get(sessionId) != null){
-            HSUserModel user = userSessionMap.containsKey(sessionId);
-            if (user != null && user.hasLoggedIn){
-                userAuthenticated =  true;
+    public String listen(@PathParam("sessionId") String sessionId, @PathParam("status") String status) {        
+        String userId = "";
+        if(userSessionMap != null){
+            if(status.equals("success")){
+                if (userSessionMap.containsKey(sessionId) && userSessionMap.get(sessionId) != null){
+                    HSUserModel user = userSessionMap.get(sessionId);
+                    if (user != null && user.hasLoggedIn){
+                        userId = user.userId;
+                    }
+                }
+            }else{
+                if (userSessionMap.containsKey(sessionId)){
+                    userSessionMap.remove(sessionId);
+                }
             }
         }
-        return userAuthenticated;
+        return userId;        
     }
 
     @GET
@@ -89,22 +100,48 @@ public class HSResourceProvider implements RealmResourceProvider {
         return sessionId;
     }
 
+
+    // will use this code once we fix the 3rd party api library use in this project.
+    // @POST
+    // @Path("sign")
+    // @Consumes(MediaType.APPLICATION_JSON)
+    // @Produces(MediaType.APPLICATION_JSON)
+    // public HSUserModel postSignature(String body) {
+    //     HSUserModel user = null;
+    //     if(!body.isEmpty()){
+    //         JSONObject bodyObj = new JSONObject(body);
+            
+    //         String serssionId = bodyObj.getString("sessionId");
+    //         String userId = bodyObj.getString("sessionId");
+    //         if(isSignatureValid(serssionId, userId, "")){
+    //             if (!this.userSessionMap.containsKey(serssionId)){
+    //                 user = new HSUserModel(userId, true);
+    //                 this.userSessionMap.put(sessionId, user);
+
+    //                 //
+    //                 // this.session.getContext
+    //             }
+    //         }           
+    //     }
+    //     return user;
+    // }
+
     @POST
-    @Path("sign")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
-    public HSUserModel postSignature(String body) {
-        String serssionId = body.sessionId;
-        String userId = body.userId;
+    @Path("sign/{sessionId}/{userId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("text/plain; charset=utf-8")
+    public String postSignature(@PathParam("sessionId") String sessionId, @PathParam("userId") String userId) {
         HSUserModel user = null;
-        if(isSignatureValid(serssionId, userId, "")){
-            if (!userSessionMap.containsKey(serssionId)){
+        Boolean authenticated = false;
+        if(isSignatureValid(sessionId, userId, "")){
+            if (userSessionMap.containsKey(sessionId)){
                 user = new HSUserModel(userId, true);
                 userSessionMap.put(sessionId, user);
+                authenticated = true;
+                // this.session.getContext
             }
-        }
-        
-        return user;
+        }           
+        return authenticated.toString();
     }
 
     private Boolean isSignatureValid(String serssionId, String publickey, String signature){

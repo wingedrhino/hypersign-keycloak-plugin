@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
-KCBASE=/var/www/keycloak-6.0.1/keycloak-6.0.1
+
+KCBASE=$KCBASE
+
+if [ "$KCBASE" == "" ]; then
+  echo "Environment variable KCBASE is not. Set it to proceed."
+  exit
+fi
 
 echo "Keycloak homepath is : ${KCBASE}"
 echo "Building the hypersign plugin.."
