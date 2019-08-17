@@ -60,8 +60,9 @@ public class HyperSignAuthenticator implements Authenticator {
             context.success();
             return;
         }
+        String newHsSession = 'kjhkjhkjhkj';
         //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
-        Response challenge = context.form().setAttribute("loginMethod", "UAF").createForm("hypersign-new.ftl");
+        Response challenge = context.form().setAttribute("hsSession", newHsSession).createForm("hypersign-new.ftl");
         context.challenge(challenge);
         
         System.out.println("*********PRINTING THE ACTION URL THAT WILL BE USED BY HYPERSIGN MOBILE APP IN ORDER CALL THE KEYCLOAK ACTION************");
