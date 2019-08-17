@@ -35,6 +35,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 
+import io.hypermine.hypersign.service.AuthServerCaller;
+
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
@@ -68,6 +70,67 @@ public class HyperSignAuthenticator implements Authenticator {
         System.out.println(context.getActionUrl(context.generateAccessCode()));
         context.form().setAttribute("hypersign", "This is for HyperSign testing");
     }
+
+    @Override
+    public void authenticate(AuthenticationFlowContext context) {
+        if (hasCookie(context)) {
+            context.success();
+            return;
+        }
+        try{
+            String url = "http://localhost:8080/auth/realms/master/hypersign/session";
+            String newHSsession = AuthServerCaller.GetNewHSSession(url);
+            System.out.println("Getting session from api");
+            System.out.println(newHSsession);
+            //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
+            Response challenge = context.form().setAttribute("loginMethod", "UAF").setAttribute("hsSession",newHsSession).createForm("hypersign-new.ftl");
+            context.challenge(challenge);
+            
+            System.out.println(context.getActionUrl(context.generateAccessCode()));
+            context.form().setAttribute("hypersign", "This is for HyperSign testing");
+        }catch(Exception e){
+            System.out.println("Error occured");
+        }
+    }
+
+    /**********************************************************************************
+     * This is the main method that will get called once user solves the challenge and 
+     * click on the submit button.
+     * 
+     * ********************************************************************************/
+    // @Override
+    // public void action(AuthenticationFlowContext context) {
+    //     MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+
+    //     if (formData.containsKey("cancel")) {
+    //         context.resetFlow();
+    //         return;
+    //     }
+
+    //     logger.error("waiting for challenge response");
+
+    //     // get current Hanko request ID
+    //     UserModel currentUser = context.getUser();
+    //     String hankoRequestId = userStore.getHankoRequestId(currentUser);
+
+    //     try {
+    //         // get Hanko API key from the Hanko UAF Authenticator configuration
+    //         HankoClientConfig config = HankoUtils.createConfig(context.getSession());
+
+    //         // blocking call to Hanko API
+    //         HankoRequest hankoRequest = hankoClient.awaitConfirmation(config, hankoRequestId);
+
+    //         if (hankoRequest.isConfirmed()) {
+    //             context.success();
+    //         } else {
+    //             logger.warn("Authentication failed for user " + context.getUser().getUsername());
+    //             cancelLogin(context);
+    //         }
+    //     } catch (Exception ex) {
+    //         logger.error("Hanko request verification failed.", ex);
+    //         cancelLogin(context);
+    //     }
+    // }
 
     /**********************************************************************************
      * This is the main method that will get called once user solves the challenge and 
