@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-KCBASE=/home/vishswasb/work/proj/hm/keycloak/keycloak-8.0.0-SNAPSHOT
+KCBASE=/var/www/keycloak-6.0.1/keycloak-6.0.1
 
 echo "Keycloak homepath is : ${KCBASE}"
 echo "Building the hypersign plugin.."
@@ -15,6 +15,7 @@ cp ./dist/hanko-plugin-keycloak-ejb-0.2-SNAPSHOT.jar ${KCBASE}
 echo "Dploying the hypersign theme.."
 cp hs-themes/hypersign-config.ftl ${KCBASE}/themes/base/login
 cp hs-themes/hypersign.ftl ${KCBASE}/themes/base/login
+cp hs-themes/hypersign-new.ftl ${KCBASE}/themes/base/login
 
 echo "Deploying the hypersign plugin.."
 cd ${KCBASE}
