@@ -99,8 +99,13 @@ KCBASE="/home/vishswasb/work/proj/hm/keycloak/keycloak-8.0.0-SNAPSHOT" ./clean-b
 ![As-Is-flow.jpg](docs/As-Is-flow.jpg)
 
 
-## Hypersign Keycloack authentication workflow
+## Hypersign Keycloack login workflow
 
 ![hs-kc-e2e-flow.jpg](docs/hs-kc-e2e-flow.jpg)
+
+## Hypersign registration flow
+
+![registration-flow.jpg](docs/registration-flow.jpg)
+
 
 
