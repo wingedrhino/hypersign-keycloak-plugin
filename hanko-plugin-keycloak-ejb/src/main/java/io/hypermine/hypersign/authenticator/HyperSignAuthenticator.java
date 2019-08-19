@@ -65,17 +65,17 @@ public class HyperSignAuthenticator implements Authenticator {
             context.success();
             return;
         }
+
         //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
         Response challenge = getChallenge(context);
         context.challenge(challenge);
-        // System.out.println(context.getActionUrl(context.generateAccessCode()));
         context.form().setAttribute("hypersign", "This is for HyperSign testing");
         logger.info("HyperSignAuthenticator :: authenticate : ends");
     }
 
     protected Response getChallenge(AuthenticationFlowContext context){
         logger.info("HyperSignAuthenticator :: getChallenge : starts");
-        String url = "http://localhost:8080/auth/realms/master/hypersign/session";
+        String url = getFormattedUrl(context, "session"); // baseUrl + "/auth/realms/"+ relam +"/hypersign/session";
         // blocking call to get new session
         String newHSsession = callAPi(url);
         Response challenge = context.form().setAttribute("loginMethod", "UAF").setAttribute("hsSession",newHSsession).createForm("hypersign-new.ftl");    
@@ -116,43 +116,71 @@ public class HyperSignAuthenticator implements Authenticator {
             return "";
         }
     }
+    
+    private String getFormattedUrl(AuthenticationFlowContext context, String endpoint) {
+    	String baseUrl = "";
+    	String relam = "";
+    	String url="";    	
+    	if(context != null) {
+    		baseUrl = (context.getUriInfo() !=null && context.getUriInfo().getBaseUri() != null) 
+    				? context.getUriInfo().getBaseUri().toString() 
+    				: "http://locahost:8080/auth/";
+    		relam = (context.getRealm() != null && context.getRealm().getName() != null && !context.getRealm().getName().isEmpty()) 
+    				? context.getRealm().getName() 
+    				: "master";
+    		url = baseUrl + "realms/"+ relam +"/hypersign/" + endpoint;
+    	}
+    	return url;
+     }
 
     private boolean validateUser(AuthenticationFlowContext context) {
-        logger.info("HyperSignAuthenticator :: validateUser : starts ");
-        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-        Boolean isValid = false;
+    	Boolean isValid = false;
         String url = "";
-        String sessionId = formData.getFirst("sessionId");
-        logger.info("HyperSignAuthenticator :: validateUser : sessionId :");
-        logger.info(sessionId);
-        String userIdFromForm = formData.getFirst("userId");
-        logger.info("HyperSignAuthenticator :: validateUser : userId :");
-        logger.info(userIdFromForm);
-        // check if this user is correct from api call;
-        // blocking api call
-        url = "http://localhost:8080/auth/realms/master/hypersign/listen/" + "success/" + sessionId;
-        String userIdFromAPi = callAPi(url);
-        logger.info(userIdFromAPi);
-        if(userIdFromAPi.equals(userIdFromForm)){
-            logger.info("HyperSignAuthenticator :: validateUser : User is valid");
+        MultivaluedMap<String, String> formData = null;
+        String userIdFromForm = "";
+        String sessionId = "";
+        try {
+        	logger.info("HyperSignAuthenticator :: validateUser : starts ");
+            formData = context.getHttpRequest().getDecodedFormParameters();
+            
+            sessionId = formData.getFirst("sessionId");
+            logger.info("HyperSignAuthenticator :: validateUser : sessionId :");
+            logger.info(sessionId);
+            
+            userIdFromForm = formData.getFirst("userId");
+            logger.info("HyperSignAuthenticator :: validateUser : userId :");
+            logger.info(userIdFromForm);
+            
+            url = getFormattedUrl(context, "listen/success/" + sessionId);
+            
+            // check if this user is correct from api call;
+            // blocking api call
+            String userIdFromAPi = callAPi(url);
+            logger.info(userIdFromAPi);
+            
+            if(!userIdFromAPi.isEmpty() && userIdFromAPi.equals(userIdFromForm)){
+                logger.info("HyperSignAuthenticator :: validateUser : User is valid");
 
-            UserCredentialModel input = new UserCredentialModel();
-            // input.setType(SecretQuestionCredentialProvider.QR_CODE);
-            input.setValue("secret");
-        
-            UserModel user = context.getSession().users().getUserById(userIdFromAPi, context.getRealm());
-            context.setUser(user);
-            setCookie(context);
-            context.success();
-            isValid = true;
-        }else{
-            logger.info("HyperSignAuthenticator :: validateUser : User is not valid");
-            logger.info("HyperSignAuthenticator :: validateUser : Clear session of this user");
-            // clear session in case of failure
-            url = "http://localhost:8080/auth/realms/master/hypersign/listen/" + "fail/" +sessionId;
-            callAPi(url);
-            context.cancelLogin();
-        }
+                UserCredentialModel input = new UserCredentialModel();
+                // input.setType(SecretQuestionCredentialProvider.QR_CODE);
+                input.setValue("secret");
+            
+                UserModel user = context.getSession().users().getUserById(userIdFromAPi, context.getRealm());
+                context.setUser(user);
+                setCookie(context);
+                context.success();
+                isValid = true;
+            }else{
+                logger.info("HyperSignAuthenticator :: validateUser : User is not valid");
+                logger.info("HyperSignAuthenticator :: validateUser : Clear session of this user");
+                // clear session in case of failure
+                url = getFormattedUrl(context, "listen/fail/" + sessionId);
+                callAPi(url);
+                context.cancelLogin();
+            }
+        }catch (Exception e) {
+			// TODO: handle exception
+		}
         logger.info("HyperSignAuthenticator :: validateUser : ends ");
         return isValid;
     }

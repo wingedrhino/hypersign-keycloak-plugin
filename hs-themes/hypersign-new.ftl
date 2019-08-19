@@ -77,10 +77,13 @@
 <script>
 const start = () => {
   console.log('starting polling...')
+  const pathname = window.location.pathname; 
+  let realm = pathname.substring(pathname.lastIndexOf("ms/") + 3, pathname.lastIndexOf("/protocol"));
+  let baseUrl = window.location.origin;
   let timerId= setInterval(() => {
     console.log('tick')
     let ssSessionId = document.getElementById('hsSession').value;
-    const url  = 'http://localhost:8080/auth/realms/master/hypersign/listen/success/' + ssSessionId;
+    const url  = baseUrl + "/auth/realms/" + realm + "/hypersign/listen/success/" + ssSessionId;
     axios.get(url)
     .then(response => {
       if(response.data != ""){
