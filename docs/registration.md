@@ -36,7 +36,9 @@ Two ways for it:
 - Call goes to Keyclaock
 - `hs-authenticator` produces `Access Request` page with QR (challenge, clientId, sessionId) 
    - Polling service starts to check if the request is completed from mobile app
-   - It checks the status of this access requestion using the exposed api `/access/status` in `hs-api`
-- User scans the QR -> signs -> make api (`/access`)  with `clientId`, `signature` and `sessionId` to `hs-api`
-   - Polling service gets the status `true` from `/access/status` ->  stops polling -> redirects user to the clientn's  home page. 
+   - It checks the status of this access requestion using the exposed api `/register/access/{clientid}/status` in `hs-api`
+- User scans the QR -> signs -> make api (`/register/access/{clientid}`)  with `clientId`, `signature` and `sessionId` to `hs-api`
+- `hs-api` calls `user/{publicKey}` api of `hs-auth-server` to check if this publick is already registered.
+- After getting the response from `hs-auth-server`, `hs-api` update `status` for this call.
+- Polling service gets the status `true` from `/register/access/{clientid}/status` ->  stops polling -> redirects user to the clientn's  home page. 
 
