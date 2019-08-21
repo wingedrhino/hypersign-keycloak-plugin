@@ -27,10 +27,20 @@ ssh -i "aws-hs-keycloak.pem" ubuntu@ec2-13-234-38-26.ap-south-1.compute.amazonaw
 ```
     
 
+
+Run lsb_release -a to find the version of Ubuntu you are running.
+
+If you are running 16.04/18:
+
 ```
-sudo apt-add-repository ppa:webupd8team/java
 sudo apt-get update
-sudo apt-get install oracle-java8-installer
+sudo apt-get install openjdk-8-jdk
+```
+If you are running 14.04:
+
+```
+sudo apt-get update
+sudo apt-get install openjdk-7-jdk
 ```
 
 **Setup maven on Linux (AWS-ubuntu)**
