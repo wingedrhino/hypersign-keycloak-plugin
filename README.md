@@ -7,7 +7,7 @@ Hypersign authenticator for Keycloak
 
 #### Spin up a Ubuntu AMI and configure it
 
-Use the AWS console to create a new EC2 instance. We're only testing Keycloak out so a `t2.micro` is good. Assign it a security group with inbound ports 22 (SSL), 8080 (TCP) and 8443 (TCP) open. Restrict these to your current IP.
+Use the AWS console to create a new EC2 instance. We're only testing Keycloak out so a `t2.medium` is good. Assign it a security group with inbound ports 22 (SSL), 8080 (TCP) and 8443 (TCP) open. Restrict these to your current IP.
 
 ```
 22   SSH
