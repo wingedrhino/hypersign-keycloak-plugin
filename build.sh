@@ -8,7 +8,7 @@ rm -rf dist/
 mkdir dist
 
 echo Building ear package
-mvn package
+mvn clean package -pl \!hanko-plugin-keycloak-ear
 cp hanko-plugin-keycloak-ejb/target/hanko-plugin-keycloak-ejb-*.jar dist/
 exit
 # echo Buildung React frontend
