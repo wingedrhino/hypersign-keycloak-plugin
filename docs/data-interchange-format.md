@@ -69,7 +69,7 @@ OR
 
 ### /access
 
-User clicks on validation link in email
+User wants to login to any registered client application.
 
 ```js
 Method: POST
@@ -86,21 +86,21 @@ Request:
 Response:
 {
 	"status":"SUCCESS",
-	"data": ""
+	"data": "Access granted"
 }
 
 OR
 
 {
 	"status":"FAIL",
-	"data": "Error message"
+	"data": "Signature not valid"
 }
 ```
 
 
-### /access/status
+### /listen/register
 
-User clicks on validation link in email
+Polling service on registration page will keep listening to the requested session to see if user has scaned and called `/access` api or not.
 
 ```js
 Method: GET
@@ -154,7 +154,7 @@ OR
 
 ### /listen/login
 
-Polling service will keep listening to the requested session from login page
+Polling service on login page will keep listening to the requested session to see if user has scaned and called `/sign` api or not.
 
 ```js
 Method: POST
@@ -178,30 +178,6 @@ OR
 }
 ```
 
-### /listen/register
 
-Polling service will keep listening to the requested session from registration page
-
-```js
-Method: POST
-
-Request:
-{
-  "sessionid":"", // from /session api
-}
-
-Response:
-{
-	"status":"SUCCESS",
-	"data": "publickey"
-}
-
-OR
-
-{
-	"status":"FAIL",
-	"data": "Error message"
-}
-```
 
 
