@@ -7,3 +7,6 @@ target
 dist
 hanko-plugin-keycloak-ear
 hanko-plugin-keycloak-ejb
+hs-plugin-keycloak-ejb/dependency-reduced-pom.xml
+.project
+.classpath
