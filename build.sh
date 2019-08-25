@@ -10,7 +10,7 @@ mkdir dist
 echo Building ear package
 mvn clean package
 # mvn clean package -pl \!hanko-plugin-keycloak-ear
-cp hanko-plugin-keycloak-ejb/target/hanko-plugin-keycloak-ejb-*.jar dist/
+cp hs-plugin-keycloak-ejb/target/hs-plugin-keycloak-ejb-*.jar dist/
 exit
 # echo Buildung React frontend
 # cd hanko-account && npm install && npm run build-keycloak
