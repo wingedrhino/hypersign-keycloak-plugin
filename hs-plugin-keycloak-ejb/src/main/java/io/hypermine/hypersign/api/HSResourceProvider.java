@@ -52,6 +52,7 @@ public class HSResourceProvider implements RealmResourceProvider {
             this.data = data;
         }
     }
+    
     enum Status {
         SUCCESS,
         FAIL
@@ -61,7 +62,6 @@ public class HSResourceProvider implements RealmResourceProvider {
     private static HashMap<String, HSUserModel> userSessionMap = new HashMap<>();// this is temporary
     private KeycloakSession session;
     
-
     public HSResourceProvider(KeycloakSession session) {
         this.session = session;
     }
@@ -91,6 +91,8 @@ public class HSResourceProvider implements RealmResourceProvider {
         JSONObject bodyObj = null;
         String publicKey = "";
         String emaiid = "";
+        String username = "";
+        String companyid = "";
         UserModel newuser = null;
     	try{
             if(!body.isEmpty()){
@@ -98,11 +100,14 @@ public class HSResourceProvider implements RealmResourceProvider {
                 if(bodyObj != null){
                     publicKey = bodyObj.getString("publickey");
                     emaiid = bodyObj.getString("email");
-                    if(!publicKey.isEmpty() && !emaiid.isEmpty()) {
+                    username = bodyObj.getString("username");
+                    companyid = bodyObj.getString("companyid");
+                    if(!publicKey.isEmpty() || !emaiid.isEmpty()) {
                         newuser = this.session != null && this.session.userLocalStorage() != null
                                   ? this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true)
                                   : null;
                         if(newuser != null){
+                            // call auth-server api to register this user
                             return this.formattedReponse(Status.SUCCESS, newuser.getId());
                         }else{
                             throw new Exception("Could not create the user");                               
@@ -121,6 +126,115 @@ public class HSResourceProvider implements RealmResourceProvider {
         }    
     }
 
+    @POST
+    @Path("sign")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String sign(String body) {
+        logger.info("sign api called!");
+        JSONObject bodyObj = null;
+        String sessionId = "";
+        String publickey = "";
+        String signature = "";
+        HSUserModel user = null;
+    	try{
+            if(!body.isEmpty()){
+                bodyObj = new JSONObject(body);
+                if(bodyObj != null){
+                    publickey = bodyObj.getString("publickey");
+                    sessionId = bodyObj.getString("sessionId");
+                    signature = bodyObj.getString("signature");
+                    if(!publickey.isEmpty() || !sessionId.isEmpty() || !signature.isEmpty()) {
+                        if(isSignatureValid(sessionId, publickey, signature)){
+                            if (userSessionMap.containsKey(sessionId)){
+                                user = new HSUserModel(publickey, true);
+                                userSessionMap.put(sessionId, user);
+                                return this.formattedReponse(Status.SUCCESS, "User authenticated");    
+                            }else{
+                                throw new Exception("Invalid session");                                   
+                            }
+                        }else{
+                            throw new Exception("Invalid signature");                               
+                        }   
+                    }else {
+                        throw new Exception("Publickey, sessionId or signature is null");
+                    }            
+                }else{
+                    throw new Exception("Could not parse the body");
+                }
+            }else {
+                throw new Exception("Request body is null");
+            }
+        }catch(Exception e){
+            return this.formattedReponse(Status.FAIL,e.toString());            
+        }    
+    }
+
+    @GET
+    @Path("session")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getNewSession() {
+        logger.info("session api called!");
+        try{
+            UUID gfg = UUID.randomUUID(); 
+            String sessionId = gfg.toString();
+            if(userSessionMap != null){
+                userSessionMap.put(sessionId, null);
+                return sessionId; //this.formattedReponse(Status.SUCCESS, sessionId);    
+            }else{
+                throw new Exception("userSessionMap is null");
+            }
+        }catch(Exception e){
+            return this.formattedReponse(Status.FAIL,e.toString());            
+        }
+    }
+
+    @GET
+    @Path("listen/success/{sessionId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String listenSuccess(@PathParam("sessionId") String sessionId) {
+        logger.info("listen/success api called!");
+        try{
+            if(userSessionMap != null){
+                if (userSessionMap.containsKey(sessionId) && userSessionMap.get(sessionId) != null){
+                    HSUserModel user = userSessionMap.get(sessionId);
+                    if (user != null && user.hasLoggedIn){
+                        return user.userId; //this.formattedReponse(Status.SUCCESS, user.userId); 
+                    }else{
+                        throw new Exception("User not found or not validated");      
+                    }
+                }else{
+                    throw new Exception("Invalid session");  
+                }
+            }else{
+                throw new Exception("userSessionMap is null");
+            }
+        }catch(Exception e){
+            return this.formattedReponse(Status.FAIL,e.toString());            
+        } 
+    }
+
+    @GET
+    @Path("listen/fail/{sessionId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String listenFail(@PathParam("sessionId") String sessionId) { 
+        logger.info("listen/fail api called!");
+        try{
+            if(userSessionMap != null){
+                if (userSessionMap.containsKey(sessionId)){
+                    userSessionMap.remove(sessionId);
+                    return this.formattedReponse(Status.SUCCESS, "Session deleted");    
+                }else{
+                    throw new Exception("Invalid session");  
+                }
+            }else{
+                throw new Exception("userSessionMap is null");
+            }
+        }catch(Exception e){
+            return this.formattedReponse(Status.FAIL,e.toString());            
+        } 
+    }
+
     private String formattedReponse(Status status, String data){
         String respStr = "";
         try{
@@ -136,95 +250,9 @@ public class HSResourceProvider implements RealmResourceProvider {
         }   
         return respStr;
     }
-
-    @GET
-    @Path("listen/{status}/{sessionId}")
-    @Produces("text/plain; charset=utf-8")
-    public String listen(@PathParam("sessionId") String sessionId, @PathParam("status") String status) {        
-        String userId = "";
-        try{
-            if(userSessionMap != null){
-                if(status.equals("success")){
-                    if (userSessionMap.containsKey(sessionId) && userSessionMap.get(sessionId) != null){
-                        HSUserModel user = userSessionMap.get(sessionId);
-                        if (user != null && user.hasLoggedIn){
-                            userId = user.userId;
-                        }
-                    }
-                }else{
-                    if (userSessionMap.containsKey(sessionId)){
-                        userSessionMap.remove(sessionId);
-                    }else{
-                        return "Invalid user session. Call /session to create new one.";
-                    }
-                }
-            }else{
-                return "userSessionMap is null or empty";
-            }
-        }catch(Exception e){
-            return e.toString();
-        }
-        return userId;        
-    }
-
-    @GET
-    @Path("session")
-    @Produces("text/plain; charset=utf-8")
-    public String generateNewSession() {
-        UUID gfg = UUID.randomUUID(); 
-        String sessionId = gfg.toString();
-        userSessionMap.put(sessionId, null);
-        return sessionId;
-    }
-
-    @POST
-    @Path("sign/{sessionId}/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces("text/plain; charset=utf-8")
-    public String postSignature(@PathParam("sessionId") String sessionId, @PathParam("userId") String userId) {
-        HSUserModel user = null;
-        Boolean authenticated = false;
-        if(isSignatureValid(sessionId, userId, "")){
-            if (userSessionMap.containsKey(sessionId)){
-                user = new HSUserModel(userId, true);
-                userSessionMap.put(sessionId, user);
-                authenticated = true;
-                // this.session.getContext
-            }
-        }           
-        return authenticated.toString();
-    }
-
     
-
-    // will use this code once we fix the 3rd party api library use in this project.
-    // @POST
-    // @Path("sign")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // @Produces(MediaType.APPLICATION_JSON)
-    // public HSUserModel postSignature(String body) {
-    //     HSUserModel user = null;
-    //     if(!body.isEmpty()){
-    //         JSONObject bodyObj = new JSONObject(body);
-            
-    //         String serssionId = bodyObj.getString("sessionId");
-    //         String userId = bodyObj.getString("sessionId");
-    //         if(isSignatureValid(serssionId, userId, "")){
-    //             if (!this.userSessionMap.containsKey(serssionId)){
-    //                 user = new HSUserModel(userId, true);
-    //                 this.userSessionMap.put(sessionId, user);
-
-    //                 //
-    //                 // this.session.getContext
-    //             }
-    //         }           
-    //     }
-    //     return user;
-    // }
-
-    
-
     private Boolean isSignatureValid(String serssionId, String publickey, String signature){
+        // call auth-server to validate this user.
         return true;
     }
 

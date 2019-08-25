@@ -1,23 +1,19 @@
 # DIF
 
-### /
+### GET /
 
 Test
 
 ```js
-Method: GET
-
 Response: "Hello Keycloak"
 
 ```
 
-### /register
+### POST /register
 
 Call when user wants to register himself from mobile app.
 
 ```js
-Method: POST
-
 Request:
 {
 	"username":"",
@@ -40,100 +36,26 @@ OR
 }
 ```
 
-### /register/validate
+### GET session/
 
-User clicks on validation link in email
+Get new hypersign session
 
 ```js
-Method: GET
-
-Request:
-{
-	"sessionid":""
-}
-
 Response:
 {
 	"status":"SUCCESS",
-	"data": "You are verified."
-}
-
-OR
-
-{
-	"status":"FAIL",
-	"data": "The link is expired"
+	"data": "47064da2-7870-4126-af13-04491075e658"
 }
 ```
 
-
-### /access
-
-User wants to login to any registered client application.
-
-```js
-Method: POST
-
-Request:
-{
-	"clientid":"",     // from QR
-  "companyid":"",   // from mobile
-  "publickey":"",  // from mobile 
-  "sessionid":"", // from QR
-  "signature":"" // signed using private key
-}
-
-Response:
-{
-	"status":"SUCCESS",
-	"data": "Access granted"
-}
-
-OR
-
-{
-	"status":"FAIL",
-	"data": "Signature not valid"
-}
-```
-
-
-### /listen/register
-
-Polling service on registration page will keep listening to the requested session to see if user has scaned and called `/access` api or not.
-
-```js
-Method: GET
-
-Request:
-{
-  "sessionid":"" // on QR  
-}
-
-Response:
-{
-	"status":"SUCCESS",
-	"data": "User validated"
-}
-
-OR
-
-{
-	"status":"FAIL",
-	"data": "Error message"
-}
-```
-
-### /sign
+### POST /sign
 
 User scans the QR, sign and calls this API to get authenticated himself. 
 
 ```js
-Method: POST
-
 Request:
 {
-  "sessionid":"", // from /session api
+  "sessionId":"", // from /session api
   "publickey":"",
   "signature":""
 }
@@ -152,22 +74,16 @@ OR
 }
 ```
 
-### /listen/login
 
-Polling service on login page will keep listening to the requested session to see if user has scaned and called `/sign` api or not.
+### GET listen/success/{sessionId}
+
+Polling service on registration/login page will keep listening to the requested session to see if user has scaned and called `/sign` api or not.
 
 ```js
-Method: POST
-
-Request:
-{
-  "sessionid":"", // from /session api
-}
-
 Response:
 {
 	"status":"SUCCESS",
-	"data": "publickey"
+	"data": "user_id_001"
 }
 
 OR
@@ -179,5 +95,61 @@ OR
 ```
 
 
+### GET listen/fail/{sessionId}
+
+If user is not valid after calling `/sign`, then call this api to delete that session.
+
+```js
+Response:
+{
+	"status":"SUCCESS",
+	"data": "Session deleted"
+}
+
+OR
+
+{
+	"status":"FAIL",
+	"data": "Error message"
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### GET /register/validate
+
+User clicks on validation link in email
+
+```js
+Request:
+{
+	"sessionid":""
+}
+
+Response:
+{
+	"status":"SUCCESS",
+	"data": "You are verified."
+}
+
+OR
+
+{
+	"status":"FAIL",
+	"data": "The link is expired"
+}
+```
 
 
