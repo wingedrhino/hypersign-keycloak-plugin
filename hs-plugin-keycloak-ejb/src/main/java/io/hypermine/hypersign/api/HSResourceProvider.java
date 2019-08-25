@@ -27,6 +27,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import org.json.JSONObject;
 import org.keycloak.wildfly.adduser.*;
+import org.codehaus.jackson.map.ObjectMapper; 
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -40,6 +41,20 @@ public class HSResourceProvider implements RealmResourceProvider {
             this.userId = userId;
             this.hasLoggedIn = hasLoggedIn;
         }
+    }
+
+    class FResponse{
+        public String status;
+        public String data;
+        public FResponse(){}
+        public FResponse(String status, String data){
+            this.status = status;
+            this.data = data;
+        }
+    }
+    enum Status {
+        SUCCESS,
+        FAIL
     }
 
     private static ServicesLogger logger = ServicesLogger.LOGGER;
@@ -65,6 +80,61 @@ public class HSResourceProvider implements RealmResourceProvider {
             name = session.getContext().getRealm().getName();
         }
         return "Hello " + name;
+    }
+
+    @POST
+    @Path("register")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String register(String body) {
+        logger.info("Register api called!");
+        JSONObject bodyObj = null;
+        String publicKey = "";
+        String emaiid = "";
+        UserModel newuser = null;
+    	try{
+            if(!body.isEmpty()){
+                bodyObj = new JSONObject(body);
+                if(bodyObj != null){
+                    publicKey = bodyObj.getString("publickey");
+                    emaiid = bodyObj.getString("email");
+                    if(!publicKey.isEmpty() && !emaiid.isEmpty()) {
+                        newuser = this.session != null && this.session.userLocalStorage() != null
+                                  ? this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true)
+                                  : null;
+                        if(newuser != null){
+                            return this.formattedReponse(Status.SUCCESS, newuser.getId());
+                        }else{
+                            throw new Exception("Could not create the user");                               
+                        }
+                    }else {
+                        throw new Exception("Publickey or emailId is null");
+                    }            
+                }else{
+                    throw new Exception("Could not parse the body");
+                }
+            }else {
+                throw new Exception("Request body is null");
+            }
+        }catch(Exception e){
+            return this.formattedReponse(Status.FAIL,e.toString());            
+        }    
+    }
+
+    private String formattedReponse(Status status, String data){
+        String respStr = "";
+        try{
+            FResponse response  = new FResponse();
+            response.status = status.name();
+            response.data = data;
+            ObjectMapper Obj = new ObjectMapper();
+            // JSONObject bodyObj = new JSONObject(response);
+            respStr = Obj.writeValueAsString(response);            
+        }
+        catch(Exception e){
+            respStr = e.toString();
+        }   
+        return respStr;
     }
 
     @GET
@@ -125,25 +195,7 @@ public class HSResourceProvider implements RealmResourceProvider {
         return authenticated.toString();
     }
 
-    @POST
-    @Path("register/{publicKey}/{emaiid}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces("application/json")
-    public String register(@PathParam("publicKey") String publicKey, @PathParam("emaiid") String emaiid) {
-        try{
-            if(!publicKey.isEmpty() && !emaiid.isEmpty()) {
-                UserModel newuser = this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true);
-                if(newuser != null){
-                    return newuser.getId();
-                }
-            }else {
-                return "false";
-            }
-        }catch(Exception e){
-            return e.toString();
-        }
-        return "false";
-    }
+    
 
     // will use this code once we fix the 3rd party api library use in this project.
     // @POST
@@ -170,33 +222,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     //     return user;
     // }
 
-    @POST
-    @Path("register1")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces("application/json")
-    public String register1(String body) {
-    	try{
-            if(!body.isEmpty()){
-                JSONObject bodyObj = new JSONObject(body);
-                String publicKey =  bodyObj.getString("publicKey");
-                String emaiid =  bodyObj.getString("emaiid");
-                if(!publicKey.isEmpty() && !emaiid.isEmpty()) {
-                    UserModel newuser = this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true);
-                    if(newuser != null){
-                        return newuser.getId();
-                    }
-                }else {
-                    return "Err : Publickey or email is null";
-                }
-                    
-            }else {
-                return "Err : Request body is null";
-            }
-        }catch(Exception e){
-            return e.toString(); 
-        }    
-        return "true"; 
-    }
+    
 
     private Boolean isSignatureValid(String serssionId, String publickey, String signature){
         return true;
