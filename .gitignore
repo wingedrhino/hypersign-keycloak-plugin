@@ -5,3 +5,5 @@ keycloak/*
 target
 .settings
 dist
+hanko-plugin-keycloak-ear
+hanko-plugin-keycloak-ejb
