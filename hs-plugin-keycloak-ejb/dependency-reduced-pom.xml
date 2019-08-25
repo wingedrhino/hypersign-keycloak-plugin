@@ -41,11 +41,6 @@
   </build>
   <repositories>
     <repository>
-      <id>bintray-hanko-jvm-sdks</id>
-      <name>bintray-plugins</name>
-      <url>https://dl.bintray.com/hanko/jvm-sdks</url>
-    </repository>
-    <repository>
       <id>central</id>
       <name>bintray</name>
       <url>http://jcenter.bintray.com</url>
