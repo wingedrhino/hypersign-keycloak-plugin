@@ -20,6 +20,11 @@
             <name>bintray</name>
             <url>http://jcenter.bintray.com</url>
         </repository>
+        <repository>	
+            <id>bintray-hanko-jvm-sdks</id>	
+            <name>bintray-plugins</name>	
+            <url>https://dl.bintray.com/hanko/jvm-sdks</url>	
+        </repository>
     </repositories>
 
     <dependencies>
@@ -78,6 +83,15 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
