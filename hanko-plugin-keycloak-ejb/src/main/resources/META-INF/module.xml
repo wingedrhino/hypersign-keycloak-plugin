@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="de.brockhaus.userMgmt.control.process">   <!-- your custom module -->  
+        <resources>  
+             <resource-root path="."/>    <!--  Here . represents the current directory contents -->  
+        </resources>  
+        <dependencies>  
+            <!-- <module name="javax.api"/>  
+            <module name="org.jboss.ejb-client" optional="true"/>  
+            <module name="org.jboss.remoting"/>  
+            <module name="org.jboss.logging"/>  
+            <module name="org.jboss.marshalling"/>  
+            <module name="org.jboss.marshalling.river"/>   -->
+            <module name="org.keycloak.keycloak-common" export="true" />
+            <module name="org.keycloak.keycloak-core" export="true" />
+            <module name="org.keycloak.keycloak-services" export="true" />
+            <module name="org.keycloak.keycloak-model-jpa" export="true" />
+            <module name="org.keycloak.keycloak-server-spi" export="true" />
+            <module name="org.keycloak.keycloak-server-spi-private" export="true" />
+            <module name="org.keycloak.keycloak-wildfly-adduser" export="true" />
+            <module name="javax.ws.rs.api" export="true" />
+            <module name="javax.persistence.api" export="true" />
+            <module name="org.hibernate" export="true" />org.javassist" export="true" />
+            <module name="org.liquibase" export="true" />
+            <module name="com.fasterxml.jackson.core.jackson-core" export="true" />
+            <module name="com.fasterxml.jackson.core.jackson-databind" export="true" />
+            <module name="com.fasterxml.jackson.core.jackson-annotations" export="true" />
+            <module name="org.jboss.resteasy.resteasy-jaxrs" export="true" />
+            <module name="org.jboss.logging" export="true" />
+            <module name="org.apache.httpcomponents" export="true" />
+            <module name="org.apache.commons.codec" export="true" />
+            <!-- <module name="org.json.json" export="true" /> -->
+        </dependencies>  
+        <!-- <resources>
+            <resource-root path="org."/>
+        </resources> -->
+    </module> 

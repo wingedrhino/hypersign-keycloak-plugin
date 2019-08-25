@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-// import org.json.JSONObject;
+import org.json.JSONObject;
 import org.keycloak.wildfly.adduser.*;
 
 /**
@@ -170,33 +170,33 @@ public class HSResourceProvider implements RealmResourceProvider {
     //     return user;
     // }
 
-    // @POST
-    // @Path("register")
-    // @Consumes(MediaType.APPLICATION_JSON)
-    // @Produces("application/json")
-    // public String register(String body) {
-    // 	try{
-    //         if(!body.isEmpty()){
-    //             JSONObject bodyObj = new JSONObject(body);
-    //             String publicKey =  bodyObj.getString("publicKey");
-    //             String emaiid =  bodyObj.getString("emaiid");
-    //             if(!publicKey.isEmpty() && !emaiid.isEmpty()) {
-    //                 UserModel newuser = this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true);
-    //                 if(newuser != null){
-    //                     return newuser.getId();
-    //                 }
-    //             }else {
-    //                 return "Err : Publickey or email is null";
-    //             }
+    @POST
+    @Path("register1")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces("application/json")
+    public String register1(String body) {
+    	try{
+            if(!body.isEmpty()){
+                JSONObject bodyObj = new JSONObject(body);
+                String publicKey =  bodyObj.getString("publicKey");
+                String emaiid =  bodyObj.getString("emaiid");
+                if(!publicKey.isEmpty() && !emaiid.isEmpty()) {
+                    UserModel newuser = this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true);
+                    if(newuser != null){
+                        return newuser.getId();
+                    }
+                }else {
+                    return "Err : Publickey or email is null";
+                }
                     
-    //         }else {
-    //             return "Err : Request body is null";
-    //         }
-    //     }catch(Exception e){
-    //         return e.toString(); 
-    //     }    
-    //     return "true"; 
-    // }
+            }else {
+                return "Err : Request body is null";
+            }
+        }catch(Exception e){
+            return e.toString(); 
+        }    
+        return "true"; 
+    }
 
     private Boolean isSignatureValid(String serssionId, String publickey, String signature){
         return true;
