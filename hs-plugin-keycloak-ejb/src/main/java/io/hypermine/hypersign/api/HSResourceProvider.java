@@ -103,27 +103,23 @@ public class HSResourceProvider implements RealmResourceProvider {
                     emaiid = json.getString("email");
                     username = json.getString("username");
                     companyid = json.getString("companyid");
-                    if(!publicKey.isEmpty() || !emaiid.isEmpty()) {
-                        // saving the user in keycloak
-                        newuser = this.session != null && this.session.userLocalStorage() != null
-                                  ? this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true)
-                                  : null;
-                        if(newuser != null){
-                            //saving the user in hs-auth-server
-                            String reqstBody = "";
-                            String url = "http://localhost:3000/register";
-                            String responseFromAuthServer = AuthServerCaller.postApiCall(url,body);
-                            json = new JSONObject(responseFromAuthServer);
-                            if(json.getInt("status") == 0){
-                                //error
-                                throw new Exception(json.getString("message"));                 
-                            }else{
-                                //success
-                                return this.formattedReponse(Status.SUCCESS, json.getString("message"));
-                            }
-                            //return this.formattedReponse(Status.SUCCESS, newuser.getId());
+                    if(!publicKey.isEmpty() || !emaiid.isEmpty()) {   
+                        //saving the user in hs-auth-server                     
+                        String url = "http://localhost:3000/register";
+                        String responseFromAuthServer = AuthServerCaller.postApiCall(url,body);
+                        json = new JSONObject(responseFromAuthServer);
+                        if(json.getInt("status") == 0){                            
+                            throw new Exception(json.getString("message"));                 
                         }else{
-                            throw new Exception("Could not create the user");                               
+                            // saving the user in keycloak
+                            newuser = this.session != null && this.session.userLocalStorage() != null
+                            ? this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true)
+                            : null;
+                            if(newuser != null){
+                                return this.formattedReponse(Status.SUCCESS, json.getString("message"));
+                            }else{
+                                throw new Exception("Could not create the user");                               
+                            }
                         }
                     }else {
                         throw new Exception("Publickey or emailId is null");
