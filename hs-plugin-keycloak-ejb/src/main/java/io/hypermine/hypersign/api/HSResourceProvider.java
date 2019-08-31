@@ -36,9 +36,11 @@ import io.hypermine.hypersign.service.AuthServerCaller;
 public class HSResourceProvider implements RealmResourceProvider {
 
     class HSUserModel {
+        String challange;
         String userId;
         boolean hasLoggedIn;
-        public HSUserModel(String userId, boolean hasLoggedIn){
+        public HSUserModel(String challange, String userId, boolean hasLoggedIn){
+            this.challange = challange;
             this.userId = userId;
             this.hasLoggedIn = hasLoggedIn;
         }
@@ -143,28 +145,41 @@ public class HSResourceProvider implements RealmResourceProvider {
         logger.info("sign api called!");
         JSONObject bodyObj = null;
         String sessionId = "";
+        String challange = "";
         String publickey = "";
         String signature = "";
+        String companyId = "";
+        String rawMessage = "";
         HSUserModel user = null;
     	try{
             if(!body.isEmpty()){
                 bodyObj = new JSONObject(body);
                 if(bodyObj != null){
-                    publickey = bodyObj.getString("publickey");
-                    sessionId = bodyObj.getString("sessionId");
-                    signature = bodyObj.getString("signature");
-                    if(!publickey.isEmpty() || !sessionId.isEmpty() || !signature.isEmpty()) {
-                        if(isSignatureValid(sessionId, publickey, signature)){
-                            if (userSessionMap.containsKey(sessionId)){
-                                user = new HSUserModel(publickey, true);
-                                userSessionMap.put(sessionId, user);
-                                return this.formattedReponse(Status.SUCCESS, "User authenticated");    
+                    publickey = bodyObj.getString("publickey"); sessionId = bodyObj.getString("sessionId");
+                    challange = bodyObj.getString("challange"); signature = bodyObj.getString("signature");
+                    companyId = bodyObj.getString("companyId"); rawMessage = bodyObj.getString("rawMessage");
+                    if(!publickey.isEmpty() || 
+                        !sessionId.isEmpty() || 
+                        !signature.isEmpty() || 
+                        !challange.isEmpty() || 
+                        !companyId.isEmpty()) {
+                            String requestBody = "{\"companyId\": \"$COMPANYID\", \"publicKey\": \"$PUBLICKEY\", \"signedRsv\": \"$SIGNEDRSV\",\"rawMsg\": \"$RAWMESSAGE\", \"challange\" : \"$SESSIONID\"}";
+                            requestBody.replace("$COMPANYID", companyId);
+                            requestBody.replace("$PUBLICKEY", publickey);
+                            requestBody.replace("$SIGNEDRSV", signature);
+                            requestBody.replace("$SESSIONID", challange);
+                            requestBody.replace("$RAWMESSAGE", rawMessage);
+                            if(isSignatureValid(requestBody)){
+                                if (userSessionMap.containsKey(sessionId)){
+                                    user = new HSUserModel(challange, publickey, true);
+                                    userSessionMap.put(sessionId, user);
+                                    return this.formattedReponse(Status.SUCCESS, "User authenticated");    
+                                }else{
+                                    throw new Exception("Invalid session");                                   
+                                }
                             }else{
-                                throw new Exception("Invalid session");                                   
-                            }
-                        }else{
-                            throw new Exception("Invalid signature");                               
-                        }   
+                                throw new Exception("Invalid signature");                               
+                            }   
                     }else {
                         throw new Exception("Publickey, sessionId or signature is null");
                     }            
@@ -184,12 +199,21 @@ public class HSResourceProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     public String getNewSession() {
         logger.info("session api called!");
+        JSONObject json = null;
         try{
-            UUID gfg = UUID.randomUUID(); 
-            String sessionId = gfg.toString();
             if(userSessionMap != null){
-                userSessionMap.put(sessionId, null);
-                return sessionId; //this.formattedReponse(Status.SUCCESS, sessionId);    
+                // UUID gfg = UUID.randomUUID(); 
+                // String sessionId = gfg.toString();
+                // call auth-server for session/challenge
+                String url = "http://localhost:3000/challange";
+                String response = AuthServerCaller.getApiCall(url);
+                json = new JSONObject(response);
+                if(json != null && json.getInt("status") == 1){
+                    userSessionMap.put("sessionId", null); // this is kc session                    
+                    return json.getString("message"); //this.formattedReponse(Status.SUCCESS, sessionId);    
+                }else{
+                    throw new Exception("Could not get new challlange from auth server");
+                }
             }else{
                 throw new Exception("userSessionMap is null");
             }
@@ -260,9 +284,20 @@ public class HSResourceProvider implements RealmResourceProvider {
         return respStr;
     }
     
-    private Boolean isSignatureValid(String serssionId, String publickey, String signature){
-        // call auth-server to validate this user.
-        return true;
+    private Boolean isSignatureValid(String body){
+        try{
+            // call auth-server to validate this user.
+            String url = "http://localhost:3000/verify";
+            String responseFromAuthServer = AuthServerCaller.postApiCall(url,body);
+            JSONObject json = new JSONObject(responseFromAuthServer);
+            if(json != null  && json.getInt("status") == 1){
+                return true;
+            }else{
+                return false;
+            }
+        }catch(Exception e){
+            return false;
+        }
     }
 
     @Override
