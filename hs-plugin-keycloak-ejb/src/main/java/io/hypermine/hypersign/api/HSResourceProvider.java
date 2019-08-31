@@ -27,7 +27,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import org.json.JSONObject;
 import org.keycloak.wildfly.adduser.*;
-import org.codehaus.jackson.map.ObjectMapper; 
+import org.codehaus.jackson.map.ObjectMapper;
+import io.hypermine.hypersign.service.AuthServerCaller;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -88,7 +89,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @Produces(MediaType.APPLICATION_JSON)
     public String register(String body) {
         logger.info("Register api called!");
-        JSONObject bodyObj = null;
+        JSONObject json = null;
         String publicKey = "";
         String emaiid = "";
         String username = "";
@@ -96,19 +97,31 @@ public class HSResourceProvider implements RealmResourceProvider {
         UserModel newuser = null;
     	try{
             if(!body.isEmpty()){
-                bodyObj = new JSONObject(body);
-                if(bodyObj != null){
-                    publicKey = bodyObj.getString("publickey");
-                    emaiid = bodyObj.getString("email");
-                    username = bodyObj.getString("username");
-                    companyid = bodyObj.getString("companyid");
+                json = new JSONObject(body);
+                if(json != null){
+                    publicKey = json.getString("publickey");
+                    emaiid = json.getString("email");
+                    username = json.getString("username");
+                    companyid = json.getString("companyid");
                     if(!publicKey.isEmpty() || !emaiid.isEmpty()) {
+                        // saving the user in keycloak
                         newuser = this.session != null && this.session.userLocalStorage() != null
                                   ? this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true)
                                   : null;
                         if(newuser != null){
-                            // call auth-server api to register this user
-                            return this.formattedReponse(Status.SUCCESS, newuser.getId());
+                            //saving the user in hs-auth-server
+                            String reqstBody = "";
+                            String url = "http://localhost:3000/register";
+                            String responseFromAuthServer = AuthServerCaller.postApiCall(url,body);
+                            json = new JSONObject(responseFromAuthServer);
+                            if(json.getInt("status") == 0){
+                                //error
+                                throw new Exception(json.getString("message"));                 
+                            }else{
+                                //success
+                                return this.formattedReponse(Status.SUCCESS, json.getString("message"));
+                            }
+                            //return this.formattedReponse(Status.SUCCESS, newuser.getId());
                         }else{
                             throw new Exception("Could not create the user");                               
                         }
