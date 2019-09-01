@@ -206,7 +206,9 @@ public class HSResourceProvider implements RealmResourceProvider {
                 // String sessionId = gfg.toString();
                 // call auth-server for session/challenge
                 String url = "http://localhost:3000/challange";
-                String response = AuthServerCaller.getApiCall(url);
+                String reqstBody = "{\"kcSessionId\" : \"$KCSESSIONID\", \"companyId\":\"playground\"}";
+                reqstBody.replace("$KCSESSION", this.session.toString()); //
+                String response = AuthServerCaller.postApiCall(url, reqstBody);
                 json = new JSONObject(response);
                 if(json != null && json.getInt("status") == 1){
                     userSessionMap.put("sessionId", null); // this is kc session                    
