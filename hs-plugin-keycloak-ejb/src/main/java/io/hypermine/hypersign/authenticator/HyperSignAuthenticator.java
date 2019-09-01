@@ -35,6 +35,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import org.json.JSONObject;
 
 import io.hypermine.hypersign.service.AuthServerCaller;
 
@@ -65,7 +66,6 @@ public class HyperSignAuthenticator implements Authenticator {
             context.success();
             return;
         }
-
         //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
         Response challenge = getChallenge(context);
         context.challenge(challenge);
@@ -77,8 +77,19 @@ public class HyperSignAuthenticator implements Authenticator {
         logger.info("HyperSignAuthenticator :: getChallenge : starts");
         String url = getFormattedUrl(context, "session"); // baseUrl + "/auth/realms/"+ relam +"/hypersign/session";
         // blocking call to get new session
-        String newHSsession = callAPi(url);
-        Response challenge = context.form().setAttribute("loginMethod", "UAF").setAttribute("hsSession",newHSsession).createForm("hypersign-new.ftl");    
+        System.out.println("************************");
+        System.out.println(context.getUriInfo().getQueryParameters().getFirst("state"));
+        String executionId = context.getUriInfo().getQueryParameters().getFirst("state");
+        String newHSsession = "";
+        Response challenge = null;
+        if(executionId != null && !executionId.isEmpty()){
+            String body = "{\"kcSessionId\":\""+executionId+"\", \"companyId\" : \""+context.getRealm().getName()+"\"}";
+            newHSsession = callAPi(url, body);
+            System.out.println("************************");
+            System.out.println(newHSsession);
+            logger.info("HyperSignAuthenticator :: getChallenge : after");
+            challenge = context.form().setAttribute("loginMethod", "UAF").setAttribute("hsSession",newHSsession).setAttribute("ksSessionId",executionId).createForm("hypersign-new.ftl");    
+        }
         return challenge;
     }
 
@@ -97,6 +108,7 @@ public class HyperSignAuthenticator implements Authenticator {
         }
         logger.info("HyperSignAuthenticator :: action : before validateUser call");
         boolean validated = validateUser(context);
+        logger.info(validated);
         logger.info("HyperSignAuthenticator :: action : after validateUser call");
         if (!validated) {
             Response challenge = getChallenge(context);
@@ -105,12 +117,16 @@ public class HyperSignAuthenticator implements Authenticator {
         logger.info("HyperSignAuthenticator :: action : ends");
     }
 
-    private String callAPi(String url){
+    private String callAPi(String url, String body){
         try{
             logger.info("HyperSignAuthenticator :: callApi : start");
             logger.info("HyperSignAuthenticator :: callApi : url :");
             logger.info(url);
-            return AuthServerCaller.getApiCall(url);
+            if(body != null && !body.isEmpty()){
+                return AuthServerCaller.postApiCall(url, body);
+            }else{
+                return AuthServerCaller.getApiCall(url);
+            }
         }catch(Exception e){
             logger.error(e);
             return "";
@@ -143,29 +159,37 @@ public class HyperSignAuthenticator implements Authenticator {
         	logger.info("HyperSignAuthenticator :: validateUser : starts ");
             formData = context.getHttpRequest().getDecodedFormParameters();
             
-            sessionId = formData.getFirst("sessionId");
+            sessionId = formData.getFirst("ksSessionId");
             logger.info("HyperSignAuthenticator :: validateUser : sessionId :");
             logger.info(sessionId);
             
             userIdFromForm = formData.getFirst("userId");
-            logger.info("HyperSignAuthenticator :: validateUser : userId :");
+            logger.info("HyperSignAuthenticator :: validateUser : userId in form :");
             logger.info(userIdFromForm);
             
             url = getFormattedUrl(context, "listen/success/" + sessionId);
             
             // check if this user is correct from api call;
             // blocking api call
-            String userIdFromAPi = callAPi(url);
-            logger.info(userIdFromAPi);
+            String resp = callAPi(url,"");
+            JSONObject json  = new JSONObject(resp);
+            String userIdFromAPi = "";
+            if(json != null){
+                userIdFromAPi = json.getString("data");
+                logger.info("HyperSignAuthenticator :: validateUser : userId in api :");
+                logger.info(userIdFromAPi);
+            }else{
+                logger.info("User authentication failed from hs-auth-server");
+            }
             
-            if(!userIdFromAPi.isEmpty() && userIdFromAPi.equals(userIdFromForm)){
+            if(userIdFromAPi !=null && !userIdFromAPi.isEmpty() && userIdFromAPi.equals(userIdFromForm)){
                 logger.info("HyperSignAuthenticator :: validateUser : User is valid");
-
                 UserCredentialModel input = new UserCredentialModel();
                 // input.setType(SecretQuestionCredentialProvider.QR_CODE);
                 input.setValue("secret");
-            
-                UserModel user = context.getSession().users().getUserById(userIdFromAPi, context.getRealm());
+                userIdFromAPi = userIdFromAPi.substring(0, userIdFromAPi.length() - 6);
+                logger.info(userIdFromAPi);
+                UserModel user = context.getSession().users().getUserById("Vishwas_ne", context.getRealm());
                 context.setUser(user);
                 setCookie(context);
                 context.success();
@@ -175,10 +199,11 @@ public class HyperSignAuthenticator implements Authenticator {
                 logger.info("HyperSignAuthenticator :: validateUser : Clear session of this user");
                 // clear session in case of failure
                 url = getFormattedUrl(context, "listen/fail/" + sessionId);
-                callAPi(url);
+                callAPi(url,"");
                 context.cancelLogin();
-            }
+            }            
         }catch (Exception e) {
+            logger.error(e.toString());
 			// TODO: handle exception
 		}
         logger.info("HyperSignAuthenticator :: validateUser : ends ");

@@ -248,7 +248,7 @@ public class HSResourceProvider implements RealmResourceProvider {
                 if (userSessionMap.containsKey(sessionId) && userSessionMap.get(sessionId) != null){
                     HSUserModel user = userSessionMap.get(sessionId);
                     if (user != null && user.hasLoggedIn){
-                        return user.userId; //this.formattedReponse(Status.SUCCESS, user.userId); 
+                        return this.formattedReponse(Status.SUCCESS, user.userId); 
                     }else{
                         throw new Exception("User not found or not validated");      
                     }

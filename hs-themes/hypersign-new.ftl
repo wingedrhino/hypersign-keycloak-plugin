@@ -26,6 +26,7 @@
                   method="post">
                 <input type="hidden" name="loginMethod" value="UAF" />
                 <input type="hidden" name="sessionId" id="hsSession" value="${hsSession}" />
+                <input type="hidden" name="ksSessionId" id="ksSessionId" value="${ksSessionId}" />
                 <input type="hidden" name="userId" id="hsUserId" value="" />
             </form>
         </#if>
@@ -82,16 +83,18 @@ const start = () => {
   let baseUrl = window.location.origin;
   let timerId= setInterval(() => {
     console.log('tick')
-    let ssSessionId = document.getElementById('hsSession').value;
+    let ssSessionId = document.getElementById('ksSessionId').value;
     const url  = baseUrl + "/auth/realms/" + realm + "/hypersign/listen/success/" + ssSessionId;
+    console.log(url);// http://localhost:8080/auth/realms//auth/realms//hypersign/listen/success/
     axios.get(url)
-    .then(response => {
-      if(response.data != ""){
+    .then(resp => {
+      console.log(resp)
+      const response =  resp.data;
+      if(response != "" && response.status != "FAIL"){
         clearInterval(timerId);
         document.getElementById('hsUserId').value = response.data;
         document.getElementById('kc-hs-login-form').submit();
       }
-      console.log(response.data)
     })
     .catch(error => {
       console.log(error);
