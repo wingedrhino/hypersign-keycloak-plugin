@@ -16,16 +16,16 @@ Call when user wants to register himself from mobile app.
 ```js
 Request:
 {
-	"username":"",
-	"email":"",
-	"publickey" : "",
-	"companyid" : ""
+	"username":"newuser vishwas",
+	"email":"bhushan@imaginea.com",
+	"publickey" : "0x4b9ee8840b254bf1ec45df7802585042ac8b7f45",
+	"companyid" : "playground"
 }
 
 Response:
 {
-	"status":"SUCCESS",
-	"data": "Validation link is sent to your email. Click to verify"
+    "status": "SUCCESS",
+    "data": "Sucessfully Registered"
 }
 
 OR
@@ -36,11 +36,17 @@ OR
 }
 ```
 
-### GET session/
+### POST session/
 
 Get new hypersign session
 
-```js
+```json
+REquest:
+{
+	"kcSessionId":"my_new_session",
+	"companyId":"playground"
+}
+
 Response:
 {
 	"status":"SUCCESS",
@@ -52,18 +58,21 @@ Response:
 
 User scans the QR, sign and calls this API to get authenticated himself. 
 
-```js
+```json
 Request:
 {
-  "sessionId":"", // from /session api
-  "publickey":"",
-  "signature":""
+  "companyId": "playground",
+  "publicKey": "0x4b9ee8840b254bf1ec45df7802585042ac8b7f45",
+  "signedRsv": "{\"r\":{\"type\":\"Buffer\",\"data\":[252,54,228,125,123,61,165,211,220,106,188,36,132,83,24,198,222,145,14,60,130,34,7,130,242,181,168,104,39,193,139,168]},\"s\":{\"type\":\"Buffer\",\"data\":[6,1,54,181,191,79,237,172,147,118,175,34,9,190,1,74,24,18,44,149,49,111,23,238,72,153,98,207,249,42,167,16]},\"v\":27}",
+  "rawMsg": "Quick Brown Fox Jump Over a Lazy Dog",
+  "ksSessionId" : "my_new_session123",
+  "challenge" : "62d19600-ccaa-11e9-8e6e-c30f5e42b2be"
 }
 
 Response:
 {
-	"status":"SUCCESS",
-	"data": "User authenticated"
+    "status": "SUCCESS",
+    "data": "User authenticated"
 }
 
 OR
@@ -83,7 +92,7 @@ Polling service on registration/login page will keep listening to the requested 
 Response:
 {
 	"status":"SUCCESS",
-	"data": "user_id_001"
+	"data": "0x4b9ee8840b254bf1ec45df7802585042ac8b7f45"
 }
 
 OR

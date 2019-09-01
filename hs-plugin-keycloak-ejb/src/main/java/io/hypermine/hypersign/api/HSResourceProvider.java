@@ -113,6 +113,8 @@ public class HSResourceProvider implements RealmResourceProvider {
                         if(json.getInt("status") == 0){                            
                             throw new Exception(json.getString("message"));                 
                         }else{
+                            // I had to trim the publickey to accomodate it in ID field (which is of size 36) in db
+                            publicKey = publicKey.substring(0, publicKey.length() - 6);
                             // saving the user in keycloak
                             newuser = this.session != null && this.session.userLocalStorage() != null
                             ? this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true)
@@ -155,21 +157,22 @@ public class HSResourceProvider implements RealmResourceProvider {
             if(!body.isEmpty()){
                 bodyObj = new JSONObject(body);
                 if(bodyObj != null){
-                    publickey = bodyObj.getString("publickey"); sessionId = bodyObj.getString("sessionId");
-                    challange = bodyObj.getString("challange"); signature = bodyObj.getString("signature");
-                    companyId = bodyObj.getString("companyId"); rawMessage = bodyObj.getString("rawMessage");
+                    publickey = bodyObj.getString("publicKey"); sessionId = bodyObj.getString("ksSessionId");
+                    challange = bodyObj.getString("challenge"); signature = bodyObj.getString("signedRsv");
+                    companyId = bodyObj.getString("companyId"); rawMessage = bodyObj.getString("rawMsg");
                     if(!publickey.isEmpty() || 
                         !sessionId.isEmpty() || 
                         !signature.isEmpty() || 
                         !challange.isEmpty() || 
                         !companyId.isEmpty()) {
-                            String requestBody = "{\"companyId\": \"$COMPANYID\", \"publicKey\": \"$PUBLICKEY\", \"signedRsv\": \"$SIGNEDRSV\",\"rawMsg\": \"$RAWMESSAGE\", \"challange\" : \"$SESSIONID\"}";
-                            requestBody.replace("$COMPANYID", companyId);
-                            requestBody.replace("$PUBLICKEY", publickey);
-                            requestBody.replace("$SIGNEDRSV", signature);
-                            requestBody.replace("$SESSIONID", challange);
-                            requestBody.replace("$RAWMESSAGE", rawMessage);
-                            if(isSignatureValid(requestBody)){
+                            // String requestBody = "{\"companyId\": \"$COMPANYID\", \"publicKey\": \"$PUBLICKEY\", \"signedRsv\": \"$SIGNEDRSV\",\"rawMsg\": \"$RAWMESSAGE\", \"challenge\" : \"$SESSIONID\", \"ksSessionId\" : \"$KSSESSIONID\"}";
+                            // requestBody.replace("$COMPANYID", companyId);
+                            // requestBody.replace("$PUBLICKEY", publickey);
+                            // requestBody.replace("$SIGNEDRSV", signature);
+                            // requestBody.replace("$SESSIONID", challange);
+                            // requestBody.replace("$RAWMESSAGE", rawMessage);
+                            // requestBody.replace("$KSSESSIONID", sessionId);
+                            if(isSignatureValid(body)){
                                 if (userSessionMap.containsKey(sessionId)){
                                     user = new HSUserModel(challange, publickey, true);
                                     userSessionMap.put(sessionId, user);
@@ -194,31 +197,42 @@ public class HSResourceProvider implements RealmResourceProvider {
         }    
     }
 
-    @GET
+    @POST
     @Path("session")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getNewSession() {
+    public String getNewSession(String body) {
         logger.info("session api called!");
         JSONObject json = null;
         try{
-            if(userSessionMap != null){
-                // UUID gfg = UUID.randomUUID(); 
-                // String sessionId = gfg.toString();
-                // call auth-server for session/challenge
-                String url = "http://localhost:3000/challange";
-                String reqstBody = "{\"kcSessionId\" : \"$KCSESSIONID\", \"companyId\":\"playground\"}";
-                reqstBody.replace("$KCSESSION", this.session.toString()); //
-                String response = AuthServerCaller.postApiCall(url, reqstBody);
-                json = new JSONObject(response);
-                if(json != null && json.getInt("status") == 1){
-                    userSessionMap.put("sessionId", null); // this is kc session                    
-                    return json.getString("message"); //this.formattedReponse(Status.SUCCESS, sessionId);    
+            if(!body.isEmpty()){
+                if(userSessionMap != null){
+                    json = new JSONObject(body);
+                    String ksSessionId = json.getString("kcSessionId");
+                    String companyId = json.getString("companyId");
+                    if(json != null && !ksSessionId.isEmpty()){
+                        // call auth-server for session/challenge
+                        String url = "http://localhost:3000/challenge";
+                        String reqstBody = "{\"kcSessionId\" : \""+ksSessionId+"\", \"companyId\":\""+companyId+"\"}";
+                        String response = AuthServerCaller.postApiCall(url, reqstBody);
+                        json = new JSONObject(response);
+                        if(json != null && json.getInt("status") == 1){
+                            // json = new JSONObject(json.get("data"));
+                            userSessionMap.put(ksSessionId, null); // this is kc session                    
+                            return json.getString("data"); //this.formattedReponse(Status.SUCCESS, sessionId);    
+                        }else{
+                            throw new Exception(json.getString("message"));
+                        }
+                    }else{
+                        throw new Exception("Keycloak sessionid can not be null");
+                    }
+                    
                 }else{
-                    throw new Exception("Could not get new challlange from auth server");
+                    throw new Exception("userSessionMap is null");
                 }
             }else{
-                throw new Exception("userSessionMap is null");
+                throw new Exception("Request body can not be null");
             }
+            
         }catch(Exception e){
             return this.formattedReponse(Status.FAIL,e.toString());            
         }
@@ -239,7 +253,7 @@ public class HSResourceProvider implements RealmResourceProvider {
                         throw new Exception("User not found or not validated");      
                     }
                 }else{
-                    throw new Exception("Invalid session");  
+                    throw new Exception("Invalid session or user has not yet validated");  
                 }
             }else{
                 throw new Exception("userSessionMap is null");
