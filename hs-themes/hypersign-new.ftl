@@ -85,15 +85,16 @@ const start = () => {
     console.log('tick')
     let ssSessionId = document.getElementById('ksSessionId').value;
     const url  = baseUrl + "/auth/realms/" + realm + "/hypersign/listen/success/" + ssSessionId;
-    console.log(url);// http://localhost:8080/auth/realms//auth/realms//hypersign/listen/success/
+    console.log(url);
     axios.get(url)
     .then(resp => {
-      console.log(resp)
       const response =  resp.data;
-      if(response != "" && response.status != "FAIL"){
+      if(response && response.status != "FAIL"){
         clearInterval(timerId);
         document.getElementById('hsUserId').value = response.data;
         document.getElementById('kc-hs-login-form').submit();
+      }else{
+        console.log(response);
       }
     })
     .catch(error => {

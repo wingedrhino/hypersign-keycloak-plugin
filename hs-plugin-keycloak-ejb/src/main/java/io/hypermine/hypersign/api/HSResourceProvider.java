@@ -31,6 +31,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import io.hypermine.hypersign.service.AuthServerCaller;
 import org.keycloak.models.utils.RepresentationToModel;
 import org.keycloak.representations.idm.UserRepresentation;
+
+import java.util.Properties;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.FileInputStream;
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
@@ -65,9 +70,42 @@ public class HSResourceProvider implements RealmResourceProvider {
     private static ServicesLogger logger = ServicesLogger.LOGGER;
     private static HashMap<String, HSUserModel> userSessionMap = new HashMap<>();// this is temporary
     private KeycloakSession session;
+    private static String hsAuthServerEp = "";
     
-    public HSResourceProvider(KeycloakSession session) {
+    public HSResourceProvider(KeycloakSession session) {        
         this.session = session;
+    }
+
+    private String getHsEP() throws IOException{
+        String hsAuthServerEp = "";
+        FileInputStream fis = null;
+        try{
+            logger.info("Inside the getHsEP constructor");
+            String fileName = System.getProperty("jboss.server.config.dir") + "/hypersign.properties";
+            logger.info(fileName);
+            Properties properties =  new Properties();
+            fis = new FileInputStream(fileName);
+            properties.load(fis);
+            hsAuthServerEp = properties.getProperty("auth-server-endpoint");
+            if(!hsAuthServerEp.isEmpty()){
+                //add / if not there
+                if(hsAuthServerEp.charAt(hsAuthServerEp.length() -1) != '/'){
+                    hsAuthServerEp = hsAuthServerEp + "/";
+                }
+                logger.info("HS auth server endpoint configured.");
+                logger.info(hsAuthServerEp);
+            }else{
+                logger.info("HS auth server endpoint not configured. Setting it to default");
+                hsAuthServerEp = "http://localhost:3000/";
+                logger.info(hsAuthServerEp);
+            }
+        }catch(IOException e){
+            logger.info(e.toString());
+        }finally{
+            fis.close();
+        }
+        logger.info("Inside the getHsEP constructor ends");
+        return hsAuthServerEp;
     }
 
     @Override
@@ -108,7 +146,7 @@ public class HSResourceProvider implements RealmResourceProvider {
                     companyid = json.getString("companyid");
                     if(!publicKey.isEmpty() || !emaiid.isEmpty()) {   
                         //saving the user in hs-auth-server                     
-                        String url = "http://localhost:3000/register";
+                        String url = this.getHsEP() + "register";
                         String responseFromAuthServer = AuthServerCaller.postApiCall(url,body);
                         json = new JSONObject(responseFromAuthServer);
                         if(json.getInt("status") == 0){                            
@@ -211,7 +249,7 @@ public class HSResourceProvider implements RealmResourceProvider {
                     String companyId = json.getString("companyId");
                     if(json != null && !ksSessionId.isEmpty()){
                         // call auth-server for session/challenge
-                        String url = "http://localhost:3000/challenge";
+                        String url = this.getHsEP() + "challenge";
                         String reqstBody = "{\"kcSessionId\" : \""+ksSessionId+"\", \"companyId\":\""+companyId+"\"}";
                         String response = AuthServerCaller.postApiCall(url, reqstBody);
                         json = new JSONObject(response);
@@ -303,7 +341,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     private Boolean isSignatureValid(String body){
         try{
             // call auth-server to validate this user.
-            String url = "http://localhost:3000/verify";
+            String url = this.getHsEP() + "verify";
             String responseFromAuthServer = AuthServerCaller.postApiCall(url,body);
             JSONObject json = new JSONObject(responseFromAuthServer);
             if(json != null  && json.getInt("status") == 1){

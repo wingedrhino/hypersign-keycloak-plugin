@@ -47,7 +47,7 @@ public class HyperSignAuthenticator implements Authenticator {
 
     public static final String CREDENTIAL_TYPE = "hypersign_qrcode";
     private static ServicesLogger logger = ServicesLogger.LOGGER;
-
+    
     protected boolean hasCookie(AuthenticationFlowContext context) {
         Cookie cookie = context.getHttpRequest().getHttpHeaders().getCookies().get("HYPERSIGN_QRCODE_SOLVED");
         boolean result = cookie != null;
@@ -140,7 +140,7 @@ public class HyperSignAuthenticator implements Authenticator {
     	if(context != null) {
     		baseUrl = (context.getUriInfo() !=null && context.getUriInfo().getBaseUri() != null) 
     				? context.getUriInfo().getBaseUri().toString() 
-    				: "http://locahost:8080/auth/";
+    				: "http://localhost:8080/auth/";
     		relam = (context.getRealm() != null && context.getRealm().getName() != null && !context.getRealm().getName().isEmpty()) 
     				? context.getRealm().getName() 
     				: "master";
