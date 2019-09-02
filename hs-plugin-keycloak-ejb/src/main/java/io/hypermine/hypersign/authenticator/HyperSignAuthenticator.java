@@ -189,7 +189,7 @@ public class HyperSignAuthenticator implements Authenticator {
                 input.setValue("secret");
                 userIdFromAPi = userIdFromAPi.substring(0, userIdFromAPi.length() - 6);
                 logger.info(userIdFromAPi);
-                UserModel user = context.getSession().users().getUserById("Vishwas_ne", context.getRealm());
+                UserModel user = context.getSession().users().getUserById(userIdFromAPi, context.getRealm());
                 context.setUser(user);
                 setCookie(context);
                 context.success();

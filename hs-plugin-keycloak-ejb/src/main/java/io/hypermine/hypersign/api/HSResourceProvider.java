@@ -29,7 +29,8 @@ import org.json.JSONObject;
 import org.keycloak.wildfly.adduser.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import io.hypermine.hypersign.service.AuthServerCaller;
-
+import org.keycloak.models.utils.RepresentationToModel;
+import org.keycloak.representations.idm.UserRepresentation;
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
@@ -116,8 +117,14 @@ public class HSResourceProvider implements RealmResourceProvider {
                             // I had to trim the publickey to accomodate it in ID field (which is of size 36) in db
                             publicKey = publicKey.substring(0, publicKey.length() - 6);
                             // saving the user in keycloak
-                            newuser = this.session != null && this.session.userLocalStorage() != null
-                            ? this.session.userLocalStorage().addUser(this.session.getContext().getRealm(),publicKey,emaiid,true, true)
+                            UserRepresentation userRep = new UserRepresentation();
+                            userRep.setUsername(username);
+                            userRep.setId(publicKey);
+                            userRep.setEmail(emaiid);
+                            userRep.setEnabled(true);
+                            userRep.setEmailVerified(false);
+                            newuser = this.session != null && this.session.getContext() != null
+                            ? RepresentationToModel.createUser(this.session, this.session.getContext().getRealm(), userRep)
                             : null;
                             if(newuser != null){
                                 return this.formattedReponse(Status.SUCCESS, json.getString("message"));
@@ -165,13 +172,6 @@ public class HSResourceProvider implements RealmResourceProvider {
                         !signature.isEmpty() || 
                         !challange.isEmpty() || 
                         !companyId.isEmpty()) {
-                            // String requestBody = "{\"companyId\": \"$COMPANYID\", \"publicKey\": \"$PUBLICKEY\", \"signedRsv\": \"$SIGNEDRSV\",\"rawMsg\": \"$RAWMESSAGE\", \"challenge\" : \"$SESSIONID\", \"ksSessionId\" : \"$KSSESSIONID\"}";
-                            // requestBody.replace("$COMPANYID", companyId);
-                            // requestBody.replace("$PUBLICKEY", publickey);
-                            // requestBody.replace("$SIGNEDRSV", signature);
-                            // requestBody.replace("$SESSIONID", challange);
-                            // requestBody.replace("$RAWMESSAGE", rawMessage);
-                            // requestBody.replace("$KSSESSIONID", sessionId);
                             if(isSignatureValid(body)){
                                 if (userSessionMap.containsKey(sessionId)){
                                     user = new HSUserModel(challange, publickey, true);

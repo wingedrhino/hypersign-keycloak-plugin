@@ -46,5 +46,12 @@
 			<attribute name="m2e-apt" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="~/.m2/repository/org/keycloak/keycloak-core/4.8.3.Final/keycloak-core-4.8.3.Final.jar"/>
+	<classpathentry kind="lib" path="~/.m2/repository/org/keycloak/keycloak-common/4.8.3.Final/keycloak-common-4.8.3.Final.jar"/>
+	<classpathentry kind="lib" path="~/.m2/repository/org/keycloak/keycloak-model-jpa/4.8.3.Final/keycloak-model-jpa-4.8.3.Final.jar"/>
+	<classpathentry kind="lib" path="~/.m2/repository/org/keycloak/keycloak-wildfly-adduser/4.8.3.Final/keycloak-wildfly-adduser-4.8.3.Final.jar"/>
+	<classpathentry kind="lib" path="~/.m2/repository/org/keycloak/keycloak-services/4.8.3.Final/keycloak-services-4.8.3.Final.jar"/>
+	<classpathentry kind="lib" path="~/.m2/repository/org/keycloak/keycloak-server-spi/4.8.3.Final/keycloak-server-spi-4.8.3.Final.jar"/>
+	<classpathentry kind="lib" path="~/.m2/repository/org/keycloak/keycloak-server-spi-private/4.8.3.Final/keycloak-server-spi-private-4.8.3.Final-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
