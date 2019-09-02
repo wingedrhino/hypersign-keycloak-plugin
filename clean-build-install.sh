@@ -14,6 +14,7 @@ echo "Building the hypersign plugin.."
 echo "Cleaning the hypersign plugin.."
 rm -rf ${KCBASE}/hs-plugin-keycloak-ejb-0.2-SNAPSHOT.jar
 rm -rf ${KCBASE}/modules/hs-plugin-keycloak-ejb/
+rm -rf ${KCBASE}/standalone/configuration/hypersign.properties
 
 echo "Coping the plugin.."
 cp ./dist/hs-plugin-keycloak-ejb-0.2-SNAPSHOT.jar ${KCBASE}
@@ -22,6 +23,9 @@ echo "Dploying the hypersign theme.."
 cp hs-themes/hypersign-config.ftl ${KCBASE}/themes/base/login
 cp hs-themes/hypersign.ftl ${KCBASE}/themes/base/login
 cp hs-themes/hypersign-new.ftl ${KCBASE}/themes/base/login
+
+echo "Dploying the hypersign config file.."
+cp  hypersign.properties ${KCBASE}/standalone/configuration/
 
 echo "Deploying the hypersign plugin.."
 cd ${KCBASE}
