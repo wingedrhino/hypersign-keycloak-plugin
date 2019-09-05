@@ -38,6 +38,7 @@ import java.net.URI;
 import org.json.JSONObject;
 
 import io.hypermine.hypersign.service.AuthServerCaller;
+import io.hypermine.hypersign.authenticator.QRCodeGenerator;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -66,7 +67,6 @@ public class HyperSignAuthenticator implements Authenticator {
             context.success();
             return;
         }
-        //String response = QRCodeGenerator.createORLoginPage(context.getRealm().getDisplayName());
         Response challenge = getChallenge(context);
         context.challenge(challenge);
         context.form().setAttribute("hypersign", "This is for HyperSign testing");
@@ -81,14 +81,22 @@ public class HyperSignAuthenticator implements Authenticator {
         System.out.println(context.getUriInfo().getQueryParameters().getFirst("state"));
         String executionId = context.getUriInfo().getQueryParameters().getFirst("state");
         String newHSsession = "";
+        String relamName = context.getRealm().getName();
         Response challenge = null;
         if(executionId != null && !executionId.isEmpty()){
-            String body = "{\"kcSessionId\":\""+executionId+"\", \"companyId\" : \""+context.getRealm().getName()+"\"}";
+            String body = "{\"kcSessionId\":\""+executionId+"\", \"companyId\" : \""+relamName+"\"}";
             newHSsession = callAPi(url, body);
             System.out.println("************************");
             System.out.println(newHSsession);
             logger.info("HyperSignAuthenticator :: getChallenge : after");
-            challenge = context.form().setAttribute("loginMethod", "UAF").setAttribute("hsSession",newHSsession).setAttribute("ksSessionId",executionId).createForm("hypersign-new.ftl");    
+            String qrJson = "{\"kcSessionId\":\""+executionId+"\", \"companyId\" : \""+relamName+"\", \"hsSessionId\" : \""+newHSsession+"\"}";
+            String hsQr = QRCodeGenerator.createORLoginPage(qrJson);
+            challenge = context.form()
+                            .setAttribute("loginMethod", "UAF")
+                            .setAttribute("hsSession",newHSsession)
+                            .setAttribute("ksSessionId",executionId)
+                            .setAttribute("hsQr",hsQr)
+                            .createForm("hypersign-new.ftl");    
         }
         return challenge;
     }

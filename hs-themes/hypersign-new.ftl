@@ -19,8 +19,7 @@
     <#elseif section = "form">
         <#if loginMethod = "UAF">
             <p>Please confirm your authentication with the HyperSign Authenticator you registered with your account. Scan Qrcode.</p>
-            <img alt="QR" class="qr-code" style="max-height:150px;"
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAAMgAQAAAADzCzvFAAACPklEQVR42u3dQY7CMAwF0Nwg979lbtDZjaCxnRSYWdCXBRJF4W2/Etttxz+sBoFAIBAIBAKBQCAQCAQCgUAgEAgEAoFAIBAIBAKBQCAQyJchowWrP//0+7Vv7IJAIBAIBAKBZEh/jmWnJ2P+g41dEAgEAoFAIJAQecxxowx3p895FwQCgUAgEAjkEvL4vP4KgUAgEAgEAvkI0qNzNQgEAoFAIBDIa0j4ZEwFZSf8EzemEAgEAoFAIDdCwjL8sfr8RIcABAKBQCAQyI2QYo2kXbLvbIZAIBAIBAKBROFunkJxKhkLbyzDfkoIBAKBQCAQSBbuwuw28gbK8FytQyAQCAQCgUBWSJHpsj/LmikhEAgEAoFAIHW4mzPavDvLdz285IRAIBAIBAKBrA7V5pR3vNs0CYFAIBAIBAJJx+FnRWRts6IfAoFAIBAIBJIMCRtJjpsP3tpErS4zIRAIBAKBQCBBH2TWHNmmQfjFFggEAoFAIBBI9jKicBB++NrtcIzrsT5Ug0AgEAgEArk1kq1sCOtYxjoIBAKBQCAQSBLuspcR1e2SV5omIRAIBAKBQCBp+2NWXNaSmn0IBAKBQCAQyGZ9V3Y5WZfwp3PxIRAIBAKBQCDbSDas4tWmSQgEAoFAIBBIGu5qsBelZBAIBAKBQCCQi5eZR1QsVl9sQiAQCAQCgUBCpCjeD6extiT9QSAQCAQCgUDql0D+yYJAIBAIBAKBQCAQCAQCgUAgEAgEAoFAIBAIBAKBQCAQCOQLkB85N/YsxzpcZAAAAABJRU5ErkJggg==" />
+            <img alt="QR" class="qr-code" style="max-height:300px;"src="data:image/png;base64,${hsQr}" />
             <form action="${url.loginAction}" style="display:hidden" class="${properties.kcFFormClass!}"
                   id="kc-hs-login-form"
                   method="post">
