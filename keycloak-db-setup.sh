@@ -17,9 +17,13 @@ if [[ $KCBASE == "" ]]; then
   exit
 fi
 
+echo -e "${RED}***********START*************${NC}"
 ## POSTGRES
 # Ref: https://devopstales.github.io/sso/keycloak2/
 echo -e "${BLUE_BG}postgres${NC}"
+# credentials
+KCUSER="ksuser"
+KCPASSWORD="kcpassword"
 if [[ $(which psql) ]]; then
   echo -e "${GREEN}Postgres is already installed${NC}"
 else 
@@ -28,11 +32,12 @@ else
 fi
 # cleanups
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS keycloak;"
-sudo -u postgres psql -c "DROP USER IF EXISTS kcuser;"
+sudo -u postgres psql -c "DROP USER IF EXISTS ${KCUSER};"
 # setup
-sudo -u postgres psql -c "CREATE USER kcuser WITH PASSWORD 'kcpassword';"
-sudo -u postgres psql -c "ALTER USER kcuser WITH ENCRYPTED password 'kcpassword';"
-sudo -u postgres psql -c "CREATE DATABASE keycloak WITH ENCODING='UTF8' OWNER=kcuser;"
+echo -e "${BLUE}Setting database user-name = ${KCUSER} and password = ${KCPASSWORD} ${NC}"
+sudo -u postgres psql -c "CREATE USER ${KCUSER} WITH PASSWORD '${KCPASSWORD}';"
+sudo -u postgres psql -c "ALTER USER ${KCUSER} WITH ENCRYPTED password '${KCPASSWORD}';"
+sudo -u postgres psql -c "CREATE DATABASE keycloak WITH ENCODING='UTF8' OWNER=${KCUSER};"
 # ---------------------
 
 ## Package JDBC Driver
@@ -55,6 +60,11 @@ echo '
 </module>' > module.xml
 # ---------------------
 
+## Keeping backup of standalone.xml 
+echo -e "${BLUE_BG}Backup${NC}"
+cp $KCBASE/standalone/configuration/standalone.xml $KCBASE/standalone/configuration/standalone_bak.xml
+# ---------------------
+
 ## Load JDBC Driver
 # Ref: https://www.keycloak.org/docs/4.8/server_installation/#declare-and-load-jdbc-driver
 echo -e "${BLUE_BG}Load JDBC Driver${NC}"
@@ -72,9 +82,9 @@ sed -i 's/<connection-url>jdbc:h2:${jboss.server.data.dir}\/keycloak;AUTO_SERVER
 sed -i 's/<driver>h2<\/driver>/ \
           <driver>postgresql<\/driver>/g' $KCBASE/standalone/configuration/standalone.xml
 sed -i 's/<user-name>sa<\/user-name>/ \
-          <user-name>kcuser<\/user-name>/g' $KCBASE/standalone/configuration/standalone.xml
+          <user-name>'${KCUSER}'<\/user-name>/g' $KCBASE/standalone/configuration/standalone.xml
 sed -i 's/<password>sa<\/password>/ \
-          <password>kcpassword<\/password>/g' $KCBASE/standalone/configuration/standalone.xml
+          <password>'${KCPASSWORD}'<\/password>/g' $KCBASE/standalone/configuration/standalone.xml
 sed -i '/<driver>postgresql<\/driver>/a \
     <pool> \
       <max-pool-size>20<\/max-pool-size> \
@@ -85,6 +95,7 @@ sed -i '/<driver>postgresql<\/driver>/a \
 echo -e "${BLUE_BG}Data bindining${NC}"
 sed -i 's/ExampleDS" managed-executor-service/KeycloakDS" managed-executor-service/g' $KCBASE/standalone/configuration/standalone.xml
 # ---------------------
+echo -e "${GREEN}***********FINISH*************${NC}"
 
 # sed -i -e 's/<web-context>keycloak\/auth<\/web-context>/<web-context>auth<\/web-context>/' $KCBASE/standalone/configuration/standalone.xml
 # sed -i -e 's/<web-context>keycloak\/auth<\/web-context>/<web-context>auth<\/web-context>/' $KCBASE/standalone/configuration/standalone-ha.xml
