@@ -24,10 +24,15 @@ WEBCONTEXT="keycloak" ## keycloak/auth/
 echo -e "${BLUE_BG}Web-context${NC}"
 echo -e "${BLUE} Setting web-context = ${WEBCONTEXT}/auth${NC}"
 sed -i -e 's/<web-context>auth<\/web-context>/<web-context>'${WEBCONTEXT}'\/auth<\/web-context>/' $KCBASE/standalone/configuration/standalone.xml
-sed -i -e 's/<web-context>auth<\/web-context>/<web-context>'${WEBCONTEXT}'\/auth<\/web-context>/' $KCBASE/standalone/configuration/standalone-ha.xml
 sed -i -e 's/name="\/"/name="\/'${WEBCONTEXT}'\/"/' $KCBASE/standalone/configuration/standalone.xml
-sed -i -e 's/name="\/"/name="\/'${WEBCONTEXT}'\/"/' $KCBASE/standalone/configuration/standalone-ha.xml
 sed -i -e 's/\/auth/\/keycloak\/auth/' $KCBASE/welcome-content/index.html
+
+## Web-context configuration
+# Ref: https://www.keycloak.org/docs/latest/server_installation/index.html#enable-https-ssl-with-a-reverse-proxy
+echo -e "${BLUE_BG}Reverse-proxy and SSL${NC}"
+sed -i -e 's/redirect-socket="https"/redirect-socket="proxy-https" proxy-address-forwarding="true"/' $KCBASE/standalone/configuration/standalone.xml
+sed -i -e '/<socket-binding-group/a \
+    <socket-binding name="proxy-https" port="443"/>' $KCBASE/standalone/configuration/standalone.xml
 
 
 ## Undo
