@@ -97,10 +97,6 @@ sed -i 's/ExampleDS" managed-executor-service/KeycloakDS" managed-executor-servi
 # ---------------------
 echo -e "${GREEN}***********FINISH*************${NC}"
 
-# sed -i -e 's/<web-context>keycloak\/auth<\/web-context>/<web-context>auth<\/web-context>/' $KCBASE/standalone/configuration/standalone.xml
-# sed -i -e 's/<web-context>keycloak\/auth<\/web-context>/<web-context>auth<\/web-context>/' $KCBASE/standalone/configuration/standalone-ha.xml
-# sed -i -e 's/name="\/keycloak\"/name="\/"/' $KCBASE/standalone/configuration/standalone.xml
-# sed -i -e 's/name="\/keycloak\"/name="\/"/' $KCBASE/standalone/configuration/standalone-ha.xml
-# sed -i -e 's/\/keycloak\/auth/\/auth"/' $KCBASE/welcome-content/index.html
+
 
 
