@@ -22,7 +22,7 @@ tar xfz distribution/server-dist/target/keycloak-<VERSION>.tar.gz
 
 # run server
 cd keycloak-<VERSION>
-bin/standalone.sh
+nohup ./bin/standalone.sh &
 ```
 
 OR using docker
