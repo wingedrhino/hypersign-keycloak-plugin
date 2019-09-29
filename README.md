@@ -1,59 +1,11 @@
 # hs-authenticator
 Hypersign authenticator for Keycloak
 
-## Setup and Installation
+## AWS server setup 
 
-### Pre-requisite
+[Aws Box setup](/docs/aws-box-setup.md)
 
-#### Spin up a Ubuntu AMI and configure it
-
-Use the AWS console to create a new EC2 instance. We're only testing Keycloak out so a `t2.medium` is good. Assign it a security group with inbound ports 22 (SSL), 8080 (TCP) and 8443 (TCP) open. Restrict these to your current IP.
-
-```
-22   SSH
-8080 TCP
-8443 TCP
-```
-
-SSH into the instance and run:
-To access your instance:
-Open an SSH client. (find out how to connect using PuTTY)
-Locate your private key file (aws-hs-keycloak.pem). The wizard automatically detects the key you used to launch the instance.
-Your key must not be publicly viewable for SSH to work. Use this command if needed:
-
-```
-chmod 400 aws-hs-keycloak.pem
-ssh -i "aws-hs-keycloak.pem" ubuntu@ec2-13-234-38-26.ap-south-1.compute.amazonaws.com
-```
-    
-
-
-Run lsb_release -a to find the version of Ubuntu you are running.
-
-If you are running 16.04/18:
-
-```
-sudo apt-get update
-sudo apt-get install openjdk-8-jdk
-```
-If you are running 14.04:
-
-```
-sudo apt-get update
-sudo apt-get install openjdk-7-jdk
-```
-
-**Setup maven on Linux (AWS-ubuntu)**
-
-
-```
-sudo apt update
-sudo apt install maven
-mvn -version / mvn -v
-
-```
-
-**Setup [keycloak](https://github.com/keycloak/keycloak)**
+## Setup [keycloak](https://github.com/keycloak/keycloak)
 
 using code
 
@@ -94,41 +46,41 @@ This will pull and run keycloak docker from keycloack repo.
 
 ## Build and run hs-authenticator
 
-Set in the `bashrc`
+- Set `KCBASE` env variable in the `bashrc`
 
-```
+```sh
 vim ~/.bashrc
-## set the KCBASE vairable
-export KCBASE="/home/vishswasb/work/proj/hm/keycloak/keycloak-8.0.0-SNAPSHOT"
+export KCBASE="/home/vishswasb/work/proj/hm/keycloak/keycloak-8.0.0-SNAPSHOT" # path to keycloak home directory
+# save and close vim
 source ~/.bashrc
-
-./clean-build-install.sh
 ```
-or run directly
 
+- Set the database for keycloak [One-time]
+
+```sh
+./keycloak-db-setup.sh
 ```
-KCBASE="/home/vishswasb/work/proj/hm/keycloak/keycloak-8.0.0-SNAPSHOT" ./clean-build-install.sh
+- Set the webcontext for keyclack [One-time]
 
+```sh
+./keycloak-webcontext-setup.sh
+```
+- Now deploy hs-authenticator and run keycloak 
+
+```sh
+./clean-build-install.sh 
 ```
 
 ## Configuring HS authn in Keycloack
 
-- Login to admin console.  Hit browser refresh if you are already logged in so that the new providers show up.
-- Go to the Authentication menu item and go to the Flow tab, you will be able to view the currently
-   defined flows.  You cannot modify an built in flows, so, to add the Authenticator you
-   have to copy an existing flow or create your own.  Copy the "Browser" flow.
-- In your copy, click the "Actions" menu item and "Add Execution".  Pick Secret Question
-- Next you have to register the required action that you created. Click on the Required Actions tab in the Authenticaiton menu.
-   Click on the Register button and choose your new Required Action.
-   Your new required action should now be displayed and enabled in the required actions list.
+[keycloak basic configuration](docs/keycloak-basic-config.md)
 
-## How to test
+## How to test API endpoint 
 
 - Setup any client application, for example: `localhost:3000`
 - Open `localhost:3000` in browser
 - Get the `sessionId` from `network`, ex: `c10cdc4b-3dab-40e9-be0a-c261c3123442`.
 - Use POSTMAN to call `/sign` api with userId in the format `Keycloak-Base-Url/auth/realms/master/hypersign/sign/{sessionId}/{userId}`  asdad  `http://localhost:8080/auth/realms/master/hypersign/sign/c10cdc4b-3dab-40e9-be0a-c261c3123442/65fa0884-24ae-4c25-9260-df0f170290dc`
-
 
 
 ## As is highlevel keycloak flow
