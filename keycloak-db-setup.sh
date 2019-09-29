@@ -31,6 +31,7 @@ else
   sudo apt install postgresql postgresql-contrib
 fi
 # cleanups
+kill -9 $(lsof -t -i:8080)
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS keycloak;"
 sudo -u postgres psql -c "DROP USER IF EXISTS ${KCUSER};"
 # setup
