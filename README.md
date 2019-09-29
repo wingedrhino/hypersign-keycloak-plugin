@@ -9,25 +9,25 @@ Hypersign authenticator for Keycloak
 
 using code
 
-```
-## clone
+```sh
+# clone
 git clone https://github.com/keycloak/keycloak
 cd keycloak
 
-## build and install
+# build and install
 mvn -Pdistribution -pl distribution/server-dist -am -Dmaven.test.skip clean install
 
-## untar
+# untar
 tar xfz distribution/server-dist/target/keycloak-<VERSION>.tar.gz 
 
-## run server
+# run server
 cd keycloak-<VERSION>
 bin/standalone.sh
 ```
 
 OR using docker
 
-```
+```sh
 ./install.sh
 ```
 
