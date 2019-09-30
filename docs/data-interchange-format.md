@@ -1,6 +1,6 @@
 # DIF
 
-### GET /
+### GET dev.hs.hypermine.in/keycloak/auth/realms/master/hypersign/
 
 Test
 
@@ -9,7 +9,7 @@ Response: "Hello Keycloak"
 
 ```
 
-### POST /register
+### POST dev.hs.hypermine.in/keycloak/auth/realms/master/hypersign/register
 
 Call when user wants to register himself from mobile app.
 
@@ -36,7 +36,7 @@ OR
 }
 ```
 
-### POST session/
+### POST dev.hs.hypermine.in/keycloak/auth/realms/master/hypersign/session
 
 Get new hypersign session
 
@@ -54,7 +54,7 @@ Response:
 }
 ```
 
-### POST /sign
+### POST dev.hs.hypermine.in/keycloak/auth/realms/master/hypersign/sign/
 
 User scans the QR, sign and calls this API to get authenticated himself. 
 
@@ -84,7 +84,7 @@ OR
 ```
 
 
-### GET listen/success/{sessionId}
+### GET dev.hs.hypermine.in/keycloak/auth/realms/master/hypersign/listen/success/{sessionId}
 
 Polling service on registration/login page will keep listening to the requested session to see if user has scaned and called `/sign` api or not.
 
@@ -104,7 +104,7 @@ OR
 ```
 
 
-### GET listen/fail/{sessionId}
+### GET dev.hs.hypermine.in/keycloak/auth/realms/master/hypersign/listen/fail/{sessionId}
 
 If user is not valid after calling `/sign`, then call this api to delete that session.
 
@@ -122,21 +122,6 @@ OR
 	"data": "Error message"
 }
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### GET /register/validate
 
 User clicks on validation link in email
@@ -158,6 +143,41 @@ OR
 {
 	"status":"FAIL",
 	"data": "The link is expired"
+}
+```
+
+
+
+
+### POST https://dev.hs.hypermine.in/hsauth/company
+
+User clicks on validation link in email
+
+```js
+Request:
+{
+	"data" : {
+		"attributes" : {
+			"companyId":"master",
+			"companyName": "Hypermine",
+			"publicToken":"publicToken",
+			"other":"others"		
+		}
+	}
+}
+
+Response:
+{
+    "data": {
+        "_id": "5d9094bd76a761316aaa8570",
+        "companyId": "master",
+        "companyName": "Hypermine",
+        "publicToken": "publicToken",
+        "other": "others",
+        "createdAt": "2019-09-29T11:25:49.480Z",
+        "updatedAt": "2019-09-29T11:25:49.480Z"
+    },
+    "message": "Company Registered"
 }
 ```
 
