@@ -239,7 +239,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @POST
     @Path("session")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getNewSession(String body) {
+    public String getNewSession(String body) {
         logger.info("session api called!");
         JSONObject json = null;
         try{
@@ -273,7 +273,7 @@ public class HSResourceProvider implements RealmResourceProvider {
             }
             
         }catch(Exception e){
-            return this.formattedReponse(Status.FAIL,e.toString());            
+            return e.toString();//this.formattedReponse(Status.FAIL,e.toString());            
         }
     }
 
