@@ -1,0 +1,37 @@
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd" >
+ 
+ <web-app>
+    <display-name>Hypersign Authenticator</display-name>
+
+    <filter>
+        <filter-name>CorsFilter</filter-name>
+        <filter-class>io.hypermine.hypersign.CORSFilter</filter-class>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>CorsFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!-- <filter>
+        <filter-name>CORS</filter-name>
+        <filter-class>com.thetransactioncompany.cors.CORSFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>CORS</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping> -->
+ </web-app>
+
+
+ <!-- <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>com.howtodoinjava.examples.cors.CORSFilter</filter-class>
+</filter>
+ 
+<filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping> -->
