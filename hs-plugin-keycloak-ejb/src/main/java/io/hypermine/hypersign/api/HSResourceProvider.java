@@ -122,7 +122,7 @@ public class HSResourceProvider implements RealmResourceProvider {
         if (name == null) {
             name = session.getContext().getRealm().getName();
         }
-        return Response.ok("Hello " + name).header("Access-Control-Allow-Origin", "*").build();
+        return this.formattedReponse(Status.SUCCESS, "Hi, there!  " + name);        
     }
 
     @POST
@@ -333,23 +333,34 @@ public class HSResourceProvider implements RealmResourceProvider {
             // JSONObject bodyObj = new JSONObject(response);
             respStr = Obj.writeValueAsString(response);
             return Response
-            .ok(respStr)
+            .status(200)
             .header("Access-Control-Allow-Origin", "*")
-            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
             .header("Access-Control-Allow-Credentials", "true")
+            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
             .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-            .header("Access-Control-Max-Age", "1209600")            
-            .build();            
+            .entity(respStr)
+            .build();
+            //status(Response.Status.OK)
+            // .ok(respStr)
+            // .header("Access-Control-Allow-Origin", "*")
+            // .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+            // .header("Access-Control-Allow-Credentials", "true")
+            // .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+            // .header("Access-Control-Max-Age", "1209600")   
+            // //.entity(respStr)         
+            // .build();            
         }
         catch(Exception e){
             respStr = e.toString();
             return Response
             .ok(respStr)
+            //.status(Response.Status.BAD_REQUEST)   
             .header("Access-Control-Allow-Origin", "*")
             .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
             .header("Access-Control-Allow-Credentials", "true")
             .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
             .header("Access-Control-Max-Age", "1209600")
+            //.entity(respStr)
             .build();
         }          
     }
