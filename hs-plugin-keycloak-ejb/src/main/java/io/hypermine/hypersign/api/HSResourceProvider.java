@@ -333,25 +333,23 @@ public class HSResourceProvider implements RealmResourceProvider {
             // JSONObject bodyObj = new JSONObject(response);
             respStr = Obj.writeValueAsString(response);
             return Response
-            .status(Response.Status.OK)
+            .ok(respStr)
             .header("Access-Control-Allow-Origin", "*")
             .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
             .header("Access-Control-Allow-Credentials", "true")
             .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-            .header("Access-Control-Max-Age", "1209600")
-            .entity(respStr)
+            .header("Access-Control-Max-Age", "1209600")            
             .build();            
         }
         catch(Exception e){
             respStr = e.toString();
             return Response
-            .status(Response.Status.BAD_REQUEST)            
+            .ok(respStr)
             .header("Access-Control-Allow-Origin", "*")
             .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
             .header("Access-Control-Allow-Credentials", "true")
             .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
             .header("Access-Control-Max-Age", "1209600")
-            .entity(respStr)
             .build();
         }          
     }
