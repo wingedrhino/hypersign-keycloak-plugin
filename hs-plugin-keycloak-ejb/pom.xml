@@ -98,12 +98,6 @@
             <artifactId>core</artifactId>
             <version>2.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.thetransactioncompany</groupId>
-            <artifactId>cors-filter</artifactId>
-            <version>1.8</version>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -151,7 +145,6 @@
                                     <include>org.codehaus.jackson:*</include>
                                     <include>net.glxn.qrgen:*</include>
                                     <include>com.google.zxing:*</include>
-                                    <include>com.thetransactioncompany:*<include>
                                 </includes>
                             </artifactSet>
                         </configuration>
