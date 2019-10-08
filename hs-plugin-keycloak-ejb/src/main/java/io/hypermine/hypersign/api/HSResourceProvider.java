@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 import org.keycloak.wildfly.adduser.*;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -115,20 +116,20 @@ public class HSResourceProvider implements RealmResourceProvider {
 
     @GET
     @Produces("text/plain; charset=utf-8")
-    public String get() {
+    public Response get() {
         logger.info("This is hypersign authenticator api call");
         String name = session.getContext().getRealm().getDisplayName();
         if (name == null) {
             name = session.getContext().getRealm().getName();
         }
-        return "Hello " + name;
+        return Response.ok("Hello " + name).header("Access-Control-Allow-Origin", "*").build();
     }
 
     @POST
     @Path("register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String register(String body) {
+    public Response register(String body) {
         logger.info("Register api called!");
         JSONObject json = null;
         String publicKey = "";
@@ -188,7 +189,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @Path("sign")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String sign(String body) {
+    public Response sign(String body) {
         logger.info("sign api called!");
         JSONObject bodyObj = null;
         String sessionId = "";
@@ -238,7 +239,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @POST
     @Path("session")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getNewSession(String body) {
+    public Response getNewSession(String body) {
         logger.info("session api called!");
         JSONObject json = null;
         try{
@@ -279,7 +280,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @GET
     @Path("listen/success/{sessionId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listenSuccess(@PathParam("sessionId") String sessionId) {
+    public Response listenSuccess(@PathParam("sessionId") String sessionId) {
         logger.info("listen/success api called!");
         try{
             if(userSessionMap != null){
@@ -304,7 +305,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @GET
     @Path("listen/fail/{sessionId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listenFail(@PathParam("sessionId") String sessionId) { 
+    public Response listenFail(@PathParam("sessionId") String sessionId) { 
         logger.info("listen/fail api called!");
         try{
             if(userSessionMap != null){
@@ -322,7 +323,7 @@ public class HSResourceProvider implements RealmResourceProvider {
         } 
     }
 
-    private String formattedReponse(Status status, String data){
+    private Response formattedReponse(Status status, String data){
         String respStr = "";
         try{
             FResponse response  = new FResponse();
@@ -330,12 +331,21 @@ public class HSResourceProvider implements RealmResourceProvider {
             response.data = data;
             ObjectMapper Obj = new ObjectMapper();
             // JSONObject bodyObj = new JSONObject(response);
-            respStr = Obj.writeValueAsString(response);            
+            respStr = Obj.writeValueAsString(response);
+            return Response
+            .status(Response.Status.OK)
+            .header("Access-Control-Allow-Origin", "*")
+            .entity(respStr)
+            .build();            
         }
         catch(Exception e){
             respStr = e.toString();
-        }   
-        return respStr;
+            return Response
+            .status(Response.Status.BAD_REQUEST)
+            .header("Access-Control-Allow-Origin", "*")
+            .entity(respStr)
+            .build();
+        }          
     }
     
     private Boolean isSignatureValid(String body){
