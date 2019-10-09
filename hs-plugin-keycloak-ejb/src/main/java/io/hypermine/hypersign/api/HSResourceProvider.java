@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 import org.keycloak.wildfly.adduser.*;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -111,6 +112,18 @@ public class HSResourceProvider implements RealmResourceProvider {
     @Override
     public Object getResource() {
         return this;
+    }
+
+    @OPTIONS
+    @Path("{path : .*}")
+    public Response options() {
+        return Response.ok("")
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .header("Access-Control-Max-Age", "1209600")
+                .build();
     }
 
     @GET
