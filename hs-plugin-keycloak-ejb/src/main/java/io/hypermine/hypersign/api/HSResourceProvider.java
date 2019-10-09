@@ -114,6 +114,18 @@ public class HSResourceProvider implements RealmResourceProvider {
         return this;
     }
 
+    @OPTIONS
+    @Path("{path : .*}")
+    public Response options() {
+        return Response.ok("")
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .header("Access-Control-Max-Age", "1209600")
+                .build();
+    }
+
     @GET
     @Produces("text/plain; charset=utf-8")
     public String get() {
@@ -122,7 +134,7 @@ public class HSResourceProvider implements RealmResourceProvider {
         if (name == null) {
             name = session.getContext().getRealm().getName();
         }
-        return "Hi, there!  " + name;//this.formattedReponse(Status.SUCCESS, "Hi, there!  " + name);        
+        return this.formattedReponse(Status.SUCCESS, "Hi, there!  " + name);        
     }
 
     @POST
