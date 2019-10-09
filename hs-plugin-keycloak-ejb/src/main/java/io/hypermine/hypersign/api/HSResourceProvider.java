@@ -116,13 +116,13 @@ public class HSResourceProvider implements RealmResourceProvider {
 
     @GET
     @Produces("text/plain; charset=utf-8")
-    public Response get() {
+    public String get() {
         logger.info("This is hypersign authenticator api call");
         String name = session.getContext().getRealm().getDisplayName();
         if (name == null) {
             name = session.getContext().getRealm().getName();
         }
-        return this.formattedReponse(Status.SUCCESS, "Hi, there!  " + name);        
+        return "Hi, there!  " + name;//this.formattedReponse(Status.SUCCESS, "Hi, there!  " + name);        
     }
 
     @POST
