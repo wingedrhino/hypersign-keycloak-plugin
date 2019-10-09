@@ -128,7 +128,7 @@ public class HSResourceProvider implements RealmResourceProvider {
 
     @GET
     @Produces("text/plain; charset=utf-8")
-    public String get() {
+    public Response get() {
         logger.info("This is hypersign authenticator api call");
         String name = session.getContext().getRealm().getDisplayName();
         if (name == null) {
@@ -141,7 +141,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @Path("register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String register(String body) {
+    public Response register(String body) {
         logger.info("Register api called!");
         JSONObject json = null;
         String publicKey = "";
@@ -201,7 +201,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @Path("sign")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String sign(String body) {
+    public Response sign(String body) {
         logger.info("sign api called!");
         JSONObject bodyObj = null;
         String sessionId = "";
@@ -292,7 +292,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @GET
     @Path("listen/success/{sessionId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listenSuccess(@PathParam("sessionId") String sessionId) {
+    public Response listenSuccess(@PathParam("sessionId") String sessionId) {
         logger.info("listen/success api called!");
         try{
             if(userSessionMap != null){
@@ -317,7 +317,7 @@ public class HSResourceProvider implements RealmResourceProvider {
     @GET
     @Path("listen/fail/{sessionId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listenFail(@PathParam("sessionId") String sessionId) { 
+    public Response listenFail(@PathParam("sessionId") String sessionId) { 
         logger.info("listen/fail api called!");
         try{
             if(userSessionMap != null){
@@ -335,7 +335,7 @@ public class HSResourceProvider implements RealmResourceProvider {
         } 
     }
 
-    private String formattedReponse(Status status, String data){
+    private Response formattedReponse(Status status, String data){
         String respStr = "";
         try{
             FResponse response  = new FResponse();
@@ -344,38 +344,28 @@ public class HSResourceProvider implements RealmResourceProvider {
             ObjectMapper Obj = new ObjectMapper();
             // JSONObject bodyObj = new JSONObject(response);
             respStr = Obj.writeValueAsString(response);
-            // return Response
-            // .status(200)
-            // .header("Access-Control-Allow-Origin", "*")
-            // .header("Access-Control-Allow-Credentials", "true")
-            // .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-            // .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-            // .entity(respStr)
-            // .build();
-            //status(Response.Status.OK)
-            // .ok(respStr)
-            // .header("Access-Control-Allow-Origin", "*")
-            // .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-            // .header("Access-Control-Allow-Credentials", "true")
-            // .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-            // .header("Access-Control-Max-Age", "1209600")   
-            // //.entity(respStr)         
-            // .build();            
+            return Response
+            .status(Response.Status.OK)
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Credentials", "true")
+            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+            .entity(respStr)
+            .build();           
         }
         catch(Exception e){
             respStr = e.toString();
-            // return Response
-            // .ok(respStr)
-            // //.status(Response.Status.BAD_REQUEST)   
-            // .header("Access-Control-Allow-Origin", "*")
-            // .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-            // .header("Access-Control-Allow-Credentials", "true")
-            // .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-            // .header("Access-Control-Max-Age", "1209600")
-            // //.entity(respStr)
-            // .build();
+            return Response            
+            .status(Response.Status.BAD_REQUEST)   
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+            .header("Access-Control-Allow-Credentials", "true")
+            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+            .header("Access-Control-Max-Age", "1209600")
+            .entity(respStr)
+            .build();
         }          
-        return respStr;
+        // return respStr;
     }
     
     private Boolean isSignatureValid(String body){
