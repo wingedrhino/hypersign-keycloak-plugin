@@ -114,6 +114,18 @@ public class HSResourceProvider implements RealmResourceProvider {
         return this;
     }
 
+    @OPTIONS
+    @Path("{path : .*}")
+    public Response options() {
+        return Response.ok("")
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .header("Access-Control-Max-Age", "1209600")
+                .build();
+    }
+
     @GET
     @Produces("text/plain; charset=utf-8")
     public Response get() {
@@ -333,36 +345,27 @@ public class HSResourceProvider implements RealmResourceProvider {
             // JSONObject bodyObj = new JSONObject(response);
             respStr = Obj.writeValueAsString(response);
             return Response
-            .status(200)
+            .status(Response.Status.OK)
             .header("Access-Control-Allow-Origin", "*")
             .header("Access-Control-Allow-Credentials", "true")
             .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
             .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
             .entity(respStr)
-            .build();
-            //status(Response.Status.OK)
-            // .ok(respStr)
-            // .header("Access-Control-Allow-Origin", "*")
-            // .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-            // .header("Access-Control-Allow-Credentials", "true")
-            // .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-            // .header("Access-Control-Max-Age", "1209600")   
-            // //.entity(respStr)         
-            // .build();            
+            .build();           
         }
         catch(Exception e){
             respStr = e.toString();
-            return Response
-            .ok(respStr)
-            //.status(Response.Status.BAD_REQUEST)   
+            return Response            
+            .status(Response.Status.BAD_REQUEST)   
             .header("Access-Control-Allow-Origin", "*")
             .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
             .header("Access-Control-Allow-Credentials", "true")
             .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
             .header("Access-Control-Max-Age", "1209600")
-            //.entity(respStr)
+            .entity(respStr)
             .build();
         }          
+        // return respStr;
     }
     
     private Boolean isSignatureValid(String body){
