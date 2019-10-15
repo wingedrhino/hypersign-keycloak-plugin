@@ -83,7 +83,7 @@ const start = () => {
   let timerId= setInterval(() => {
     console.log('tick')
     let ssSessionId = document.getElementById('ksSessionId').value;
-    const url  = baseUrl + "/auth/realms/" + realm + "/hypersign/listen/success/" + ssSessionId;
+    const url  = baseUrl + "/keycloak/auth/realms/" + realm + "/hypersign/listen/success/" + ssSessionId;
     console.log(url);
     axios.get(url)
     .then(resp => {
