@@ -32,6 +32,14 @@
     </#if>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <style>
+.card-pf {
+    background: rgba(255,255,255,0) !important;
+    text-align: center;
+    margin: 0 auto;
+    max-width: 500px;
+    border-top: 0;
+    box-shadow: 0 0 0;
+}
   /* CSS used here will be applied after bootstrap.css */
 #kc-header-wrapper{
     background: url('https://i.ibb.co/n0mRFG5/HS-logo-Key-C.png') no-repeat center center fixed !important;
