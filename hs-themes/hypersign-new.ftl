@@ -32,6 +32,13 @@
     </#if>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
 <style>
+div.kc-logo-text {
+    background-image: url(http://www.hypermine.in/hypersign/wp-content/uploads/2019/03/Banner_logo2.png) !important;
+    background-repeat: no-repeat;
+    height: 63px;
+    width: 300px;
+    margin: 0 auto;
+}
 .card-pf {
     background: rgba(255,255,255,0) !important;
     text-align: center;
