@@ -8,14 +8,16 @@ echo 'Cleaning up logs and killing all processs.'
 rm -rf $LOG_DIR
 mkdir $LOG_DIR
 
-sudo kill -9 $(lsof -i :8080 -t)  > /dev/null
-sudo kill -9 $(lsof -i :3000 -t)  > /dev/null
-sudo kill -9 $(lsof -i :8081 -t)  > /dev/null
+#sudo kill -9 $(lsof -i :8080 -t)  > /dev/null
+#sudo kill -9 $(lsof -i :3000 -t)  > /dev/null
+#sudo kill -9 $(lsof -i :8081 -t)  > /dev/null
+
+sh ./stop-all.sh
 
 
 echo 'Starting key-cloak'
 cd /home/ubuntu/hs/hs-authenticator/
-nohup ./clean_build_install.sh > $LOG_DIR/key-cloak.out &
+nohup ./clean-build-install.sh > $LOG_DIR/key-cloak.out &
 cd -
 
 
