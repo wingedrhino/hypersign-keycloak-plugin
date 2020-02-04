@@ -5,6 +5,7 @@ set -e
 
 echo Clean dist directory
 rm -rf dist/
+rm -rf hs-authenticator.tar.gz
 mkdir dist
 
 echo Building ear package
@@ -12,6 +13,7 @@ mvn clean package
 cp hs-plugin-keycloak-ejb/target/hs-plugin-keycloak-ejb-*.jar dist/
 tar cvf hs-theme.tar.gz hs-themes
 mv hs-theme.tar.gz dist/ 
+cp hypersign.properties dist/
 mv dist hs-authenticator
 tar cvf hs-authenticator.tar.gz hs-authenticator
 mv hs-authenticator dist

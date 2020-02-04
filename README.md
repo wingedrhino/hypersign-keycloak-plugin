@@ -1,6 +1,15 @@
 # hs-authenticator
 Hypersign authenticator for Keycloak
 
+## Quick build and release
+
+```sh
+./build.sh
+git tag <version_name>
+git push origin --tags
+```
+
+
 ## AWS server setup 
 
 [Aws Box setup](/docs/aws-box-setup.md)
