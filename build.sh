@@ -15,6 +15,6 @@ tar cvf hs-theme.tar.gz hs-themes
 mv hs-theme.tar.gz dist/ 
 cp hypersign.properties dist/
 mv dist hs-authenticator
-tar cvf hs-authenticator.tar.gz hs-authenticator
+tar -zcvf hs-authenticator.tar.gz hs-authenticator
 mv hs-authenticator dist
 exit
